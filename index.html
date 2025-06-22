@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso Google Ads - Domine os Anúncios Online</title>
+<!-- Favicon - substitua o link abaixo pelo seu favicon -->
+  <link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiFMDxXXJXDMDCcWu2KKGfWYQkFczvnkgyo9PIwicfMlLEx0VMKfizSIOTDMSbcTTgbo76R_Jbcl2gbN6ixycAVbINbFweUBXBNdT-C1V3oqjgS9zct3w6-K73bLebk7TVzZA2jngnv4zjHkdDY21JXG0J0xOGjbovaXKrN4uaiQUr0a8E_S-88VrVZrM8/s320/favicon-ads.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .cta-button {
+            background: #ff6b6b;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .cta-button:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .hero-feature {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Video Preview */
+        .video-preview {
+            background: #f8f9fa;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .video-container {
+            background: #000;
+            border-radius: 15px;
+            padding: 2rem;
+            display: inline-block;
+            margin: 2rem 0;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .video-placeholder {
+            width: 600px;
+            height: 400px;
+            background: linear-gradient(45deg, #333, #555);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            position: relative;
+        }
+        
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .play-button:hover {
+            transform: scale(1.1);
+            background: #ff5252;
+        }
+        
+        .play-button::after {
+            content: "";
+            width: 0;
+            height: 0;
+            border-left: 20px solid white;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 5px;
+        }
+        
+        /* About Section */
+        .about {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .about-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .about-text p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+        
+        .about-image {
+            text-align: center;
+        }
+        
+        .instructor-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .instructor-avatar {
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        
+        /* Benefits Section */
+        .benefits {
+            background: #f8f9fa;
+            padding: 80px 0;
+        }
+        
+        .benefits h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .benefit-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .benefit-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .benefit-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .benefit-card p {
+            color: #666;
+        }
+        
+        /* Course Content */
+        .course-content {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .course-content h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .module-card {
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .module-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102,126,234,0.1);
+        }
+        
+        .module-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .module-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .lessons-list {
+            list-style: none;
+        }
+        
+        .lessons-list li {
+            padding: 0.5rem 0;
+            color: #666;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        
+        .lessons-list li:before {
+            content: "▶";
+            color: #667eea;
+            margin-right: 0.5rem;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            background: #f8f9fa;
+            padding: 80px 0;
+        }
+        
+        .testimonials h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .testimonial-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .testimonial-card:before {
+            content: """;
+            font-size: 4rem;
+            color: #667eea;
+            position: absolute;
+            top: -10px;
+            left: 20px;
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1rem;
+            color: #666;
+        }
+        
+        .testimonial-author {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .testimonial-role {
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+        
+        /* Pricing */
+        .pricing {
+            background: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .pricing h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+        
+        .pricing-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(102,126,234,0.3);
+        }
+        
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        
+        .price-old {
+            font-size: 1.5rem;
+            text-decoration: line-through;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-features {
+            list-style: none;
+            margin: 2rem 0;
+        }
+        
+        .price-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .price-features li:before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        .bonus-section {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        
+        .bonus-section h4 {
+            color: #FFD700;
+            margin-bottom: 1rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .cta-button-large {
+            background: white;
+            color: #ff6b6b;
+            padding: 20px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .cta-button-large:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        
+        .guarantee {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+        
+        .footer-section p {
+            color: #ccc;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #555;
+            padding-top: 2rem;
+            color: #999;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-features {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .video-placeholder {
+                width: 100%;
+                max-width: 400px;
+                height: 250px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            header {
+                position: relative;
+            }
+            
+            .hero {
+                margin-top: 0;
+                padding: 60px 0 40px;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .benefit-card,
+        .module-card,
+        .testimonial-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Focus styles for accessibility */
+        .cta-button:focus,
+        .cta-button-large:focus {
+            outline: 3px solid rgba(255,255,255,0.5);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">🎯 Google Ads Mastery</div>
+                <a href="https://pay.hotmart.com/C89397871K" class="cta-button">Comprar Agora</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Domine o Google Ads e Multiplique Seus Resultados</h1>
+            <p>Aprenda do zero ao avançado com videoaulas práticas e estratégias comprovadas</p>
+            
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <h3>📹 +17 Videoaulas</h3>
+                    <p>Conteúdo prático e direto</p>
+                </div>
+                <div class="hero-feature">
+                    <h3>🎯 Casos Reais</h3>
+                    <p>Exemplos de campanhas de sucesso</p>
+                </div>
+                <div class="hero-feature">
+                    <h3>📈 Resultados Comprovados</h3>
+                    <p>Métodos testados no mercado</p>
+                </div>
+            </div>
+            
+            <a href="https://pay.hotmart.com/C89397871K" class="cta-button-large">Começar Agora</a>
+        </div>
+    </section>
+
+  <center><img border="0" data-original-height="1024" data-original-width="1536" height="1024" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhZ2YHdHdaGtsdzWNK2w5mpt-9fR9GLx6mjaHDl0PpBb3tLS0AU5WUUQeVwU15MnivYewdrAOCqzfPq3eo5XF3SxNAoNxcJGVfwTGGIzgO0gp1p2m0qfSoKklrf9O2Qh9b30xe04WBq2groKSt-jCK7iH4VCt4KE8zN7re5-wjIkyBtIt4Nk4Ge62-JB7w/s1536/google_ads_dashboard.png" width="1024" /></a></div><br />
+    </center>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Transforme Seu Negócio com Google Ads</h2>
+                    <p>O Google Ads é a ferramenta mais poderosa para atrair clientes qualificados e acelerar o crescimento do seu negócio. Mas sem o conhecimento correto, você pode estar jogando dinheiro fora.</p>
+                    <p>Nosso curso foi desenvolvido por especialistas com mais de 5 anos de experiência gerenciando campanhas que já investiram milhões em anúncios online.</p>
+                    <p>Você vai aprender não apenas a teoria, mas principalmente como aplicar na prática com estratégias que realmente funcionam no mercado brasileiro.</p>
+                </div>
+                <div class="about-image">
+                    <div class="instructor-card">
+                        <div class="instructor-avatar">👨‍💼</div>
+                        <h3>João Silva</h3>
+                        <p>Especialista em Google Ads</p>
+                        <p>+5 anos de experiência</p>
+                        <p>+R$ 10 milhões gerenciados</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <h2>O Que Você Vai Conquistar</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <h3>Campanhas Lucrativas</h3>
+                    <p>Aprenda a criar campanhas que geram mais leads e vendas com menor investimento</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">📊</div>
+                    <h3>Análise de Dados</h3>
+                    <p>Domine as métricas mais importantes e tome decisões baseadas em dados reais</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h3>ROI Otimizado</h3>
+                    <p>Maximize o retorno sobre investimento e reduza o custo por conversão</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🚀</div>
+                    <h3>Crescimento Acelerado</h3>
+                    <p>Escale seu negócio rapidamente com estratégias avançadas de Google Ads</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎓</div>
+                    <h3>Qualificação</h3>
+                    <p>Aqui você irá aprender na prática e se destacar no mercado</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🤝</div>
+                    <h3>Suporte Exclusivo</h3>
+                    <p>Tire suas dúvidas direto com o instrutor por 7 dias</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Course Content -->
+    <section class="course-content">
+        <div class="container">
+            <h2>Conteúdo do Curso</h2>
+            <div class="modules-grid">
+                <div class="module-card">
+                    <div class="module-number">1</div>
+                    <h3>Fundamentos do Google Ads</h3>
+                    <ul class="lessons-list">
+                        <li>Introdução ao Google Ads</li>
+                        <li>Estrutura de contas e campanhas</li>
+                        <li>Configuração inicial</li>
+                        <li>Definindo objetivos</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <div class="module-number">2</div>
+                    <h3>Pesquisa de Palavras-chave</h3>
+                    <ul class="lessons-list">
+                        <li>Planejador de palavras-chave</li>
+                        <li>Intenção de busca</li>
+                        <li>Correspondências de palavras</li>
+                        <li>Palavras-chave negativas</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <div class="module-number">3</div>
+                    <h3>Criação de Anúncios</h3>
+                    <ul class="lessons-list">
+                        <li>Anúncios responsivos</li>
+                        <li>Extensões de anúncios</li>
+                        <li>Copywriting persuasivo</li>
+                        <li>Testes A/B</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <div class="module-number">4</div>
+                    <h3>Segmentação e Lances</h3>
+                    <ul class="lessons-list">
+                        <li>Estratégias de lances</li>
+                        <li>Segmentação por público</li>
+                        <li>Segmentação geográfica</li>
+                        <li>Horários de exibição</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <div class="module-number">5</div>
+                    <h3>Otimização e Análise</h3>
+                    <ul class="lessons-list">
+                        <li>Métricas importantes</li>
+                        <li>Relatórios avançados</li>
+                        <li>Otimização contínua</li>
+                        <li>Troubleshooting</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <div class="module-number">6</div>
+                    <h3>Estratégias Avançadas</h3>
+                    <ul class="lessons-list">
+                        <li>Remarketing</li>
+                        <li>Campanhas de Display</li>
+                        <li>Shopping Ads</li>
+                        <li>Automação inteligente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>O Que Nossos Alunos Dizem</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        Depois do curso, consegui reduzir meu CPC em 40% e aumentar as conversões em 120%. O investimento se pagou na primeira semana!
+                    </div>
+                    <div class="testimonial-author">Maria Santos</div>
+                    <div class="testimonial-role">E-commerce de Moda</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        Conteúdo extremamente prático e didático. Em 30 dias já estava gerenciando campanhas profissionalmente.
+                    </div>
+                    <div class="testimonial-author">Carlos Lima</div>
+                    <div class="testimonial-role">Freelancer Digital</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        O curso transformou minha agência. Agora consigo entregar resultados muito melhores para meus clientes.
+                    </div>
+                    <div class="testimonial-author">Ana Costa</div>
+                    <div class="testimonial-role">Agência de Marketing</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2>Oferta Especial por Tempo Limitado</h2>
+            <div class="pricing-card">
+                <h3>Curso Completo Google Ads</h3>
+                <div class="price-old">De R$ 297</div>
+                <div class="price">R$ 87</div>
+                                
+                <ul class="price-features">
+                    <li>+17 videoaulas em HD</li>
+                    <li>Acesso vitalício ao curso</li>
+                    <li>Certificado de conclusão</li>
+                    <li>Suporte por 7 dias</li>
+                    <li>Atualizações gratuitas</li>
+                    </ul>
+                
+                <div class="bonus-section">
+                    <h4>🎁 Bônus Exclusivos:</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>✓ Templates de anúncios</li>
+                        <li>✓ Planilha de controle</li>
+                        <li>✓ Checklist de otimização</li>
+                    </ul>
+                </div>
+                
+                <a href="https://pay.hotmart.com/C89397871K" class="cta-button-large">Garantir Minha Vaga</a>
+                
+                <div class="guarantee">
+                    <strong>🛡️ Garantia de 7 dias</strong><br>
+                    Se não ficar satisfeito, devolvemos 100% do seu dinheiro
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Não Perca Esta Oportunidade</h2>
+            <p>Apenas 48 horas para garantir este preço especial</p>
+            <a href="https://pay.hotmart.com/C89397871K" class="cta-button-large">Quero Começar Agora</a>
+            
+            <div class="guarantee">
+                <p>⏰ Oferta válida para Agora</p>
+                <p>🔒 Ambiente seguro - SSL 256 bits</p>
+                <p>💳 Aceitamos todos os cartões</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Categoria</h3>
+                    <p>Curso Online</p>
+                    
+                </div>
+                <div class="footer-section">
+                    <h3>Loja Online</h3>
+                    <p>Localização</p>
+                    <p>São Paulo, SP</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <p>Termos de Uso</p>
+                    <p>Política de Privacidade</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Google Ads Mastery. Todos os direitos reservados.</p>
+                <p><em>Criado por RGB hotmart</em></p>
+            </div>
+        </div>
+    </footer>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>
