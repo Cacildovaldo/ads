@@ -2,651 +2,126 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>AI eBook Studio Pro - Gerador de eBooks com Imagens e IA</title>
-    <script src="https://cdn.jsdelivr.net/npm/html2pdf@0.10.1/dist/html2pdf.bundle.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI eBook Creator PRO - Versão Estável</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            min-height: 100vh;
-            padding: 24px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255,255,255,0.98);
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            overflow: hidden;
-            backdrop-filter: blur(2px);
-        }
-
-        @media (max-width: 900px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-            body { padding: 12px; }
-            .form-section { padding: 28px; }
-            .preview-section { padding: 28px; min-height: 500px; }
-        }
-
-        .form-section {
-            padding: 40px;
-            background: white;
-            overflow-y: auto;
-            max-height: 95vh;
-        }
-
-        .preview-section {
-            background: linear-gradient(125deg, #1e1b4b 0%, #2d3a6e 100%);
-            padding: 40px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            min-height: 700px;
-        }
-
-        h1 {
-            background: linear-gradient(135deg, #4f46e5, #a855f7);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 8px;
-            font-size: 32px;
-            font-weight: 800;
-        }
-
-        .subtitle {
-            color: #475569;
-            margin-bottom: 24px;
-            font-size: 14px;
-            border-left: 3px solid #8b5cf6;
-            padding-left: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 700;
-            color: #0f172a;
-            font-size: 14px;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 14px;
-            transition: all 0.2s;
-            background: #fefefe;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139,92,246,0.2);
-        }
-
-        .pages-slider {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .pages-slider input {
-            flex: 1;
-        }
-        .pages-value {
-            background: #4f46e5;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-weight: bold;
-            min-width: 65px;
-            text-align: center;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin: 28px 0 16px;
-        }
-        button {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 15px;
-        }
-        .btn-generate {
-            background: linear-gradient(95deg, #4f46e5, #a855f7);
-            color: white;
-            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
-        }
-        .btn-generate:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05);}
-        .btn-download {
-            background: #10b981;
-            color: white;
-        }
-        .btn-download:hover:not(:disabled) { background: #059669; transform: translateY(-2px);}
-        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none;}
-
-        .api-card {
-            background: #f1f5f9;
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 24px;
-            border-left: 5px solid #4f46e5;
-        }
-        .api-key-input {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .api-status {
-            font-size: 12px;
-            margin-top: 8px;
-            padding: 6px 12px;
-            border-radius: 40px;
-            display: inline-block;
-        }
-        .status-message {
-            padding: 12px;
-            border-radius: 14px;
-            font-size: 13px;
-            margin-top: 12px;
-            display: none;
-        }
-        .progress-bar {
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 10px;
-            margin: 16px 0;
-            overflow: hidden;
-            display: none;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4f46e5, #c084fc);
-            width: 0%;
-            transition: width 0.2s;
-        }
-        .loading-spinner {
-            display: none;
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #4f46e5;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 16px auto;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .preview-content-card {
-            background: white;
-            border-radius: 24px;
-            padding: 24px;
-            color: #1e293b;
-            text-align: left;
-            margin-top: 24px;
-            max-height: 500px;
-            overflow-y: auto;
-            width: 100%;
-            display: none;
-        }
-        .preview-content-card.show { display: block; }
-        .preview-content-card img { max-width: 100%; border-radius: 16px; margin: 12px 0; box-shadow: 0 6px 12px rgba(0,0,0,0.1);}
-        .page-counter-badge {
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(8px);
-            padding: 6px 18px;
-            border-radius: 60px;
-            font-size: 13px;
-            margin-top: 20px;
-            display: inline-block;
-        }
-
-        /* Estilo para PDF */
-        #ebookContainer .page {
-            background: white;
-            padding: 40px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            page-break-after: always;
-            position: relative;
-        }
-        #ebookContainer .cover-page {
-            background: linear-gradient(135deg, #4f46e5, #a855f7);
-            color: white;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-height: 90vh;
-        }
-        #ebookContainer .cover-page h1 { color: white; font-size: 48px; background: none; -webkit-background-clip: unset;}
-        #ebookContainer h2 { color: #4f46e5; margin-bottom: 20px; font-size: 28px;}
-        #ebookContainer p { line-height: 1.7; margin-bottom: 16px; color: #334155;}
-        #ebookContainer img { max-width: 80%; height: auto; margin: 20px auto; display: block; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);}
-        .page-number { text-align: center; margin-top: 30px; color: #94a3b8; font-size: 12px;}
-
-        .info-modern {
-            background: #eef2ff;
-            border-radius: 16px;
-            padding: 14px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        select, input[type="number"] { background: white; }
+        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; display: flex; gap: 20px; }
+        .setup-panel { width: 350px; background: white; padding: 20px; border-radius: 10px; height: fit-content; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .preview-panel { flex: 1; background: #ddd; padding: 20px; border-radius: 10px; min-height: 80vh; overflow-y: auto; }
+        input, textarea, button { width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { cursor: pointer; background: #4f46e5; color: white; font-weight: bold; border: none; }
+        button:disabled { background: #ccc; }
+        .page { background: white; width: 210mm; min-height: 297mm; padding: 20mm; margin: 0 auto 20px auto; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+        .cover { background: #4f46e5; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .progress { background: #e0e0e0; height: 10px; border-radius: 5px; margin-bottom: 10px; display: none; }
+        .progress-fill { background: #4f46e5; height: 100%; width: 0%; border-radius: 5px; transition: 0.3s; }
+        img { max-width: 100%; height: auto; border-radius: 8px; margin: 15px 0; display: block; }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="form-section">
-        <h1>📖 AI eBook Studio Pro</h1>
-        <p class="subtitle">Gere eBooks completos com imagens reais + até 100 páginas | IA Gemini 2.5 Flash + Imagen 3</p>
 
-        <div class="api-card">
-            <strong>🔑 Google Gemini API Key (obtenha grátis em <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#4f46e5;">AI Studio</a>)</strong>
-            <div class="api-key-input">
-                <input type="password" id="apiKey" placeholder="Insira sua chave Gemini...">
-                <button onclick="saveApiKey()" style="background:#4f46e5; color:white; padding:0 18px;">Salvar</button>
-            </div>
-            <div id="apiStatus" class="api-status" style="background:#e2e8f0; margin-top:10px;"></div>
-            <div style="font-size:12px; margin-top:8px;">✨ <strong>Dica:</strong> Para imagens usamos Gemini Imagen 3 (se disponível) + fallback com placeholders premium. O conteúdo é rico e estruturado.</div>
-        </div>
+    <div class="setup-panel">
+        <h2>Configuração</h2>
+        <input type="password" id="apiKey" placeholder="Sua API Key do Gemini">
+        <input type="text" id="title" placeholder="Título do Ebook">
+        <textarea id="prompt" rows="5" placeholder="Descreva o conteúdo detalhadamente..."></textarea>
+        <label>Páginas (Ex: 50):</label>
+        <input type="number" id="pages" value="10" min="3" max="100">
+        
+        <div class="progress" id="progBar"><div class="progress-fill" id="fill"></div></div>
+        <p id="statusText" style="font-size: 12px; color: #666;"></p>
 
-        <form id="ebookForm" onsubmit="generateEbook(event)">
-            <div class="form-group">
-                <label>Título do eBook <span style="color:#e11d48;">*</span></label>
-                <input type="text" id="title" placeholder="Ex: Revolução da IA Prática" value="Guia Definitivo de Produtividade com IA" required>
-            </div>
-            <div class="form-group">
-                <label>Prompt / Descrição do Conteúdo <span style="color:#e11d48;">*</span></label>
-                <textarea id="prompt" rows="3" placeholder="Descreva o tema principal, capítulos desejados, estilo..." required>Crie um guia completo sobre como usar Inteligência Artificial para aumentar a produtividade no trabalho e estudos. Inclua técnicas avançadas, ferramentas atuais, cases reais e dicas práticas. O livro deve ser inspirador e bem detalhado.</textarea>
-            </div>
-            <div class="form-group">
-                <label>Número de Páginas (máx 100)</label>
-                <div class="pages-slider">
-                    <input type="range" id="pages" min="3" max="100" value="12">
-                    <span class="pages-value" id="pagesValue">12</span>
-                </div>
-                <div class="info-modern">⚡ Quanto mais páginas, mais tempo para geração (recomendado até 50 para melhor desempenho). Cada página terá título, conteúdo rico e imagem ilustrativa.</div>
-            </div>
-            <div class="form-group">
-                <label>Estilo do Conteúdo</label>
-                <select id="style">
-                    <option value="profissional e técnico">Profissional & Técnico</option>
-                    <option value="criativo e inspirador">Criativo & Inspirador</option>
-                    <option value="educacional didático">Educacional Didático</option>
-                    <option value="executivo resumido">Executivo Resumido</option>
-                </select>
-            </div>
-            <div class="button-group">
-                <button type="submit" class="btn-generate" id="generateBtn">🚀 Gerar eBook Agora</button>
-                <button type="button" class="btn-download" id="downloadBtn" disabled onclick="downloadPDF()">📥 Baixar PDF</button>
-            </div>
-            <div id="statusMessage" class="status-message"></div>
-            <div id="progressBar" class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-            <div id="loadingSpinner" class="loading-spinner"></div>
-        </form>
-
-        <div class="info-modern" style="background:#f1f5f9; margin-top:16px;">
-            🌟 <strong>APIs gratuitas alternativas (além do Google AI Studio):</strong> <br>
-            • <strong>GroqCloud</strong> (LLaMA 3, Mixtral) – API rápida, 30 req/min gratuita.<br>
-            • <strong>Cohere</strong> – Trial com 1000 req/mês para geração de texto.<br>
-            • <strong>Hugging Face Inference API</strong> – modelos gratuitos com rate limits.<br>
-            • <strong>Replicate</strong> – créditos iniciais para geração texto/imagem.<br>
-            • <strong>Stability AI</strong> – algumas chamadas mensais para imagens.<br>
-            ⚡ Neste app usamos Gemini pelo poder multimodal e estabilidade.
-        </div>
+        <button id="btnGen" onclick="startGeneration()">Gerar Ebook</button>
+        <button id="btnPdf" onclick="downloadPDF()" disabled style="background: #10b981;">Baixar PDF</button>
     </div>
 
-    <div class="preview-section">
-        <div class="preview-title" id="previewTitle" style="font-size:28px; font-weight:700;">✨ Pré-visualização</div>
-        <div class="preview-info" id="previewInfo">Aguardando geração do eBook</div>
-        <div id="previewSpinner" class="loading-spinner"></div>
-        <div class="preview-content-card" id="previewContent"></div>
-        <div class="page-counter-badge" id="pageCounter"></div>
+    <div class="preview-panel" id="renderArea">
+        <div style="text-align: center; color: #666; margin-top: 50px;">O preview do seu ebook aparecerá aqui.</div>
     </div>
-</div>
-<div id="ebookContainer" style="display: none;"></div>
 
-<script>
-    // ========== CONFIG ==========
-    const API_KEY_STORAGE = 'gemini_pro_key';
-    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-    let currentApiKey = localStorage.getItem(API_KEY_STORAGE);
-    let generatedEbook = null;
-    let isGenerating = false;
-    let abortController = null;
+    <script>
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
-    document.addEventListener('DOMContentLoaded', () => {
-        updateApiStatus();
-        const slider = document.getElementById('pages');
-        const pagesVal = document.getElementById('pagesValue');
-        slider.addEventListener('input', () => pagesVal.textContent = slider.value);
-        if(currentApiKey) document.getElementById('apiKey').value = '';
-    });
+        async function startGeneration() {
+            const key = document.getElementById('apiKey').value;
+            const title = document.getElementById('title').value;
+            const promptStr = document.getElementById('prompt').value;
+            const totalPages = parseInt(document.getElementById('pages').value);
 
-    function saveApiKey() {
-        const key = document.getElementById('apiKey').value.trim();
-        if(!key) { showStatus('Digite uma chave válida', 'error'); return; }
-        localStorage.setItem(API_KEY_STORAGE, key);
-        currentApiKey = key;
-        document.getElementById('apiKey').value = '';
-        updateApiStatus();
-        showStatus('✅ Chave API salva com sucesso!', 'success');
-    }
+            if(!key || !title) return alert("Preencha a Chave API e o Título!");
 
-    function updateApiStatus() {
-        const el = document.getElementById('apiStatus');
-        if(currentApiKey) {
-            el.innerHTML = '✅ Conectado ao Google Gemini (modo avançado)';
-            el.style.background = '#d9f99d';
-            el.style.color = '#166534';
-        } else {
-            el.innerHTML = '⚠️ Nenhuma chave definida. Insira sua API Key para gerar conteúdo real.';
-            el.style.background = '#fee2e2';
-            el.style.color = '#991b1b';
+            const btn = document.getElementById('btnGen');
+            const render = document.getElementById('renderArea');
+            const fill = document.getElementById('fill');
+            const prog = document.getElementById('progBar');
+            const status = document.getElementById('statusText');
+
+            btn.disabled = true;
+            render.innerHTML = '';
+            prog.style.display = 'block';
+
+            // 1. Capa
+            render.innerHTML += `<div class="page cover"><h1>${title}</h1><p>Gerado por Inteligência Artificial</p></div>`;
+
+            // 2. Loop de Páginas
+            for(let i = 1; i <= totalPages; i++) {
+                status.innerText = `Gerando página ${i} de ${totalPages}...`;
+                fill.style.width = `${(i / totalPages) * 100}%`;
+
+                try {
+                    const content = await callAI(key, title, promptStr, i, totalPages);
+                    render.innerHTML += `
+                        <div class="page">
+                            <h2>${content.capitulo}</h2>
+                            <img src="https://image.pollinations.ai/prompt/${encodeURIComponent(content.img_desc)}?width=800&height=600&nologo=true">
+                            <p style="text-align: justify; white-space: pre-wrap;">${content.texto}</p>
+                            <div style="margin-top:20px; text-align:center; color:#999;">Página ${i}</div>
+                        </div>`;
+                } catch (err) {
+                    console.error(err);
+                    status.innerText = "Erro na API. Verifique o console (F12).";
+                    break;
+                }
+                // Delay para evitar bloqueio da API (Rate Limit)
+                await new Promise(r => setTimeout(r, 800));
+            }
+
+            status.innerText = "✅ Ebook Concluído!";
+            btn.disabled = false;
+            document.getElementById('btnPdf').disabled = false;
         }
-    }
 
-    function showStatus(msg, type) {
-        const el = document.getElementById('statusMessage');
-        el.textContent = msg;
-        el.className = `status-message show ${type}`;
-        if(type !== 'info') setTimeout(() => el.classList.remove('show'), 5000);
-    }
+        async function callAI(key, title, context, pageNum, total) {
+            const instructions = `Aja como um escritor de ebooks. Escreva a página ${pageNum} de um livro chamado "${title}". 
+            Contexto: ${context}. Responda APENAS em formato JSON puro: 
+            {"capitulo": "Título da Página", "texto": "Conteúdo com 200 palavras", "img_desc": "descrição curta em inglês para imagem"}`;
 
-    function updateProgress(percent) {
-        const fill = document.getElementById('progressFill');
-        fill.style.width = `${Math.min(100, percent)}%`;
-    }
-
-    // ========== GERAÇÃO DE TEXTO (GEMINI 2.5 FLASH) ==========
-    async function callGeminiText(promptText, maxTokens = 1200) {
-        if(!currentApiKey) throw new Error('Chave de API não configurada');
-        const response = await fetch(`${GEMINI_API_URL}/gemini-2.0-flash-exp:generateContent?key=${currentApiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }],
-                generationConfig: { temperature: 0.75, maxOutputTokens: maxTokens, topP: 0.95 }
-            })
-        });
-        if(!response.ok) {
-            const err = await response.json();
-            throw new Error(`Erro Gemini: ${response.status} - ${err.error?.message || 'falha na requisição'}`);
-        }
-        const data = await response.json();
-        if(data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-            return data.candidates[0].content.parts[0].text;
-        }
-        throw new Error('Resposta inválida da API de texto');
-    }
-
-    // Geração de imagem usando Imagen 3 ou fallback
-    async function generateImageFromDescription(desc, pageNum) {
-        if(!currentApiKey) return generatePremiumPlaceholder(desc);
-        try {
-            // Tentativa com Imagen-3 (se disponível na conta)
-            const response = await fetch(`${GEMINI_API_URL}/imagen-3.0-generate-001:generateContent?key=${currentApiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+            const resp = await fetch(`${API_URL}?key=${key}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: `Ilustração profissional e elegante para um livro: ${desc}. Estilo moderno, alta qualidade, cores harmoniosas.` }] }]
+                    contents: [{ parts: [{ text: instructions }] }],
+                    generationConfig: { responseMimeType: "application/json", temperature: 0.7 }
                 })
             });
-            if(response.ok) {
-                const data = await response.json();
-                if(data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data) {
-                    const b64 = data.candidates[0].content.parts[0].inlineData.data;
-                    return `data:image/png;base64,${b64}`;
-                }
-            }
-        } catch(e) { console.warn("Imagen não disponível, usando fallback premium", e); }
-        return generatePremiumPlaceholder(desc);
-    }
 
-    function generatePremiumPlaceholder(text) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 800;
-        canvas.height = 500;
-        const ctx = canvas.getContext('2d');
-        const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        grad.addColorStop(0, '#2e3b8c');
-        grad.addColorStop(1, '#7c3aed');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 30px "Segoe UI"';
-        ctx.shadowBlur = 12;
-        ctx.textAlign = 'center';
-        ctx.fillText(`📘 ${text.substring(0, 45)}`, canvas.width/2, canvas.height/2);
-        ctx.font = '18px system-ui';
-        ctx.fillStyle = '#f3e8ff';
-        ctx.fillText('Imagem ilustrativa gerada por IA', canvas.width/2, canvas.height - 60);
-        return canvas.toDataURL('image/jpeg', 0.9);
-    }
-
-    // ========== CONSTRUÇÃO DAS PÁGINAS ==========
-    async function generateEbookContentAdvanced(title, mainPrompt, totalPages, style) {
-        const pagesData = [];
-        // Capa
-        pagesData.push({ type: 'cover', title: title, subtitle: `Inteligência Artificial • ${totalPages} páginas de conhecimento`, styleHint: style });
-
-        for(let i = 1; i <= totalPages; i++) {
-            const progressPercent = (i / totalPages) * 90;
-            updateProgress(progressPercent);
-            
-            const chapterPrompt = `
-            Você é um autor renomado de eBooks técnicos e inspiradores. Estilo do conteúdo: ${style}.
-            Título do livro: "${title}". Tema central: ${mainPrompt}.
-            
-            Gere o conteúdo ESPECÍFICO para a PÁGINA ${i} de ${totalPages} deste eBook. 
-            A página deve ter:
-            1. Um título cativante e relevante para o fluxo do livro.
-            2. Um parágrafo principal detalhado e rico (180-250 palavras) com informações valiosas, dicas, ou explicações.
-            3. Uma pequena seção de destaque (callout) com curiosidade ou insight prático.
-            4. Uma descrição de imagem que ilustre perfeitamente o tema da página (máx 80 palavras).
-            
-            FORMATO EXATO (respeite os marcadores):
-            TÍTULO: [título da página]
-            CONTEÚDO: [texto principal com estrutura em parágrafos]
-            DESTAQUE: [frase de impacto ou insight]
-            DESCRIÇÃO_IMAGEM: [descrição visual detalhada para gerar imagem]
-            `;
-            
-            let pageText = "";
-            try {
-                pageText = await callGeminiText(chapterPrompt, 1400);
-            } catch(err) {
-                console.error(`Falha na página ${i}`, err);
-                pageText = `TÍTULO: Página Estratégica ${i}\nCONTEÚDO: Exploração profunda sobre ${mainPrompt}. Esta seção aborda conceitos fundamentais e aplicações práticas no contexto atual. Continue explorando as melhores práticas.\nDESTAQUE: "O conhecimento transforma realidades."\nDESCRIÇÃO_IMAGEM: Visão abstrata futurista com elementos de tecnologia e criatividade.`;
-            }
-
-            const titleMatch = pageText.match(/TÍTULO:\s*(.+?)(?=CONTEÚDO:|$)/is);
-            const contentMatch = pageText.match(/CONTEÚDO:\s*(.+?)(?=DESTAQUE:|$)/is);
-            const highlightMatch = pageText.match(/DESTAQUE:\s*(.+?)(?=DESCRIÇÃO_IMAGEM:|$)/is);
-            const imgDescMatch = pageText.match(/DESCRIÇÃO_IMAGEM:\s*(.+?)$/is);
-            
-            const pageTitle = titleMatch ? titleMatch[1].trim() : `${title} – Capítulo ${i}`;
-            let mainContent = contentMatch ? contentMatch[1].trim() : `Conteúdo detalhado sobre ${mainPrompt}. Esta página oferece insights profundos e exemplos práticos alinhados ao estilo ${style}. Continue lendo para dominar o assunto.`;
-            const highlight = highlightMatch ? highlightMatch[1].trim() : "✨ Dica: A prática consistente leva à maestria.";
-            const imgDescription = imgDescMatch ? imgDescMatch[1].trim() : `Ilustração conceitual de ${pageTitle} relacionado à inteligência artificial.`;
-            
-            // Enriquece conteúdo com destaque
-            mainContent += `\n\n💡 ${highlight}`;
-            
-            // Gerar imagem
-            let imageUrl = null;
-            try {
-                imageUrl = await generateImageFromDescription(imgDescription, i);
-                await new Promise(r => setTimeout(r, 400)); // pequeno delay para evitar throttling
-            } catch(imgErr) {
-                console.warn("Falha imagem, fallback:", imgErr);
-                imageUrl = generatePremiumPlaceholder(pageTitle);
-            }
-            
-            pagesData.push({
-                type: 'content',
-                title: pageTitle,
-                content: mainContent,
-                image: imageUrl,
-                pageNumber: i,
-                highlight: highlight
-            });
+            if (!resp.ok) throw new Error("Falha na API");
+            const data = await resp.json();
+            return JSON.parse(data.candidates[0].content.parts[0].text);
         }
-        updateProgress(100);
-        return pagesData;
-    }
 
-    // ========== GERAR EBOOK PRINCIPAL ==========
-    async function generateEbook(event) {
-        event.preventDefault();
-        if(isGenerating) { showStatus('Já existe uma geração em andamento...', 'info'); return; }
-        if(!currentApiKey) { showStatus('⚠️ Defina sua chave Gemini no campo acima', 'error'); return; }
-        
-        const title = document.getElementById('title').value.trim();
-        const promptBase = document.getElementById('prompt').value.trim();
-        let pagesCount = parseInt(document.getElementById('pages').value);
-        if(pagesCount > 100) pagesCount = 100;
-        if(pagesCount < 3) pagesCount = 3;
-        const style = document.getElementById('style').value;
-        
-        if(!title || !promptBase) { showStatus('Preencha título e descrição', 'error'); return; }
-        
-        isGenerating = true;
-        document.getElementById('generateBtn').disabled = true;
-        document.getElementById('downloadBtn').disabled = true;
-        document.getElementById('loadingSpinner').classList.add('show');
-        document.getElementById('progressBar').classList.add('show');
-        showStatus(`🚀 Gerando eBook com ${pagesCount} páginas (pode levar alguns minutos dependendo do tamanho)...`, 'info');
-        
-        try {
-            generatedEbook = await generateEbookContentAdvanced(title, promptBase, pagesCount, style);
-            // Atualizar preview
-            displayPreviewRich(title, pagesCount);
-            document.getElementById('downloadBtn').disabled = false;
-            showStatus(`✅ eBook "${title}" gerado com sucesso! ${pagesCount} páginas + imagens. Clique em baixar PDF.`, 'success');
-        } catch(err) {
-            console.error(err);
-            showStatus(`Erro crítico: ${err.message}. Verifique sua chave API e tente novamente.`, 'error');
-            generatedEbook = null;
-        } finally {
-            isGenerating = false;
-            document.getElementById('generateBtn').disabled = false;
-            document.getElementById('loadingSpinner').classList.remove('show');
-            if(!generatedEbook) document.getElementById('progressBar').classList.remove('show');
-            else updateProgress(100);
+        function downloadPDF() {
+            const element = document.getElementById('renderArea');
+            const opt = {
+                margin: 0,
+                filename: 'ebook-ia-pro.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 1.5, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
         }
-    }
-    
-    function displayPreviewRich(title, pages) {
-        document.getElementById('previewTitle').innerHTML = `📘 ${escapeHtml(title)}`;
-        document.getElementById('previewInfo').innerHTML = `eBook com ${pages} páginas | visualização da primeira página de conteúdo`;
-        document.getElementById('pageCounter').innerHTML = `📄 Total: ${pages} páginas + capa`;
-        if(generatedEbook && generatedEbook.length > 1) {
-            const firstContent = generatedEbook.find(p => p.type === 'content');
-            if(firstContent) {
-                let previewHtml = `<h3 style="color:#4f46e5;">📌 ${escapeHtml(firstContent.title)}</h3>`;
-                previewHtml += `<p style="font-size:14px; line-height:1.6;">${escapeHtml(firstContent.content.substring(0, 350))}...</p>`;
-                if(firstContent.image) previewHtml += `<img src="${firstContent.image}" alt="preview" style="max-width:100%; border-radius:16px;">`;
-                document.getElementById('previewContent').innerHTML = previewHtml;
-                document.getElementById('previewContent').classList.add('show');
-            } else {
-                document.getElementById('previewContent').innerHTML = `<p>Conteúdo gerado, visualize no PDF final.</p>`;
-                document.getElementById('previewContent').classList.add('show');
-            }
-        }
-    }
-    
-    // ========== DOWNLOAD PDF OTIMIZADO ==========
-    function downloadPDF() {
-        if(!generatedEbook || generatedEbook.length === 0) {
-            showStatus('Nenhum eBook disponível', 'error');
-            return;
-        }
-        const container = document.getElementById('ebookContainer');
-        container.innerHTML = '';
-        generatedEbook.forEach((page, idx) => {
-            const pageDiv = document.createElement('div');
-            pageDiv.className = 'page';
-            if(page.type === 'cover') {
-                pageDiv.classList.add('cover-page');
-                pageDiv.innerHTML = `
-                    <div style="text-align:center; padding:20px;">
-                        <h1 style="font-size: 52px; margin-bottom:24px;">${escapeHtml(page.title)}</h1>
-                        <p style="font-size: 22px; opacity:0.9;">${escapeHtml(page.subtitle)}</p>
-                        <hr style="width:100px; margin:30px auto; border-color:rgba(255,255,255,0.3);">
-                        <p style="font-size:16px;">Gerado com AI eBook Studio Pro • Conteúdo dinâmico com IA</p>
-                    </div>
-                `;
-            } else {
-                let inner = `<h2>${escapeHtml(page.title)}</h2>`;
-                if(page.image) inner += `<img src="${page.image}" alt="illustration">`;
-                inner += `<div>${escapeHtml(page.content).replace(/\n/g, '<br>')}</div>`;
-                inner += `<div class="page-number">Página ${page.pageNumber}</div>`;
-                pageDiv.innerHTML = inner;
-            }
-            container.appendChild(pageDiv);
-        });
-        
-        const opt = {
-            margin: [10, 10, 10, 10],
-            filename: `ebook_${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: { scale: 2, logging: false, useCORS: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(container).save().then(() => {
-            showStatus('📄 PDF gerado e baixado com sucesso!', 'success');
-        }).catch(err => {
-            console.error(err);
-            showStatus('Erro ao gerar PDF, tente novamente', 'error');
-        });
-    }
-    
-    function escapeHtml(str) {
-        if(!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if(m === '&') return '&amp;';
-            if(m === '<') return '&lt;';
-            if(m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
-        });
-    }
-</script>
+    </script>
 </body>
 </html>
