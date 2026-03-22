@@ -3,70 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Conteúdo para Ebook (Word Ready)</title>
+    <title>Ebook Flow - Groq Fix</title>
     <style>
-        :root { --primary: #2d3436; --accent: #6c5ce7; --bg: #f4f7f6; }
-        body { font-family: 'Calibri', 'Segoe UI', serif; background: var(--bg); margin: 0; display: flex; }
+        :root { --accent: #6c5ce7; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; display: flex; }
         
-        /* Painel Lateral */
         .sidebar { width: 340px; background: white; height: 100vh; padding: 25px; position: fixed; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; z-index: 100; }
-        h2 { color: var(--accent); font-size: 1.4rem; margin-bottom: 20px; }
         label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.85rem; }
         input, textarea, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; }
         
         button { background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; margin-top: 20px; }
-        button:hover { background: #5649c0; }
         button:disabled { background: #b2bec3; cursor: not-allowed; }
 
-        .copy-btn { background: #00b894; margin-top: 10px; font-size: 1.1rem; padding: 15px; }
-        .copy-btn:hover { background: #009677; }
+        .copy-btn { background: #00b894; margin-top: 10px; font-size: 1.1rem; padding: 15px; display: none; }
         
-        /* Área de Texto Contínuo */
-        .main { margin-left: 340px; flex: 1; padding: 60px; display: flex; flex-direction: column; align-items: center; }
-        #ebook-stream { width: 100%; max-width: 850px; background: white; padding: 50px; border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); min-height: 80vh; }
+        .main { margin-left: 340px; flex: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        #ebook-stream { width: 100%; max-width: 800px; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); min-height: 80vh; }
         
-        /* Estilização dos Capítulos (Pensada para o Word) */
-        .chapter-header { text-align: center; margin-top: 50px; margin-bottom: 20px; }
-        .chapter-emoji { font-size: 60px; display: block; margin-bottom: 10px; }
-        .chapter-title { color: #000; font-size: 28px; text-transform: uppercase; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .content-block { font-size: 13pt; line-height: 1.6; text-align: justify; color: #333; margin-bottom: 40px; white-space: pre-wrap; }
+        .chapter-header { text-align: center; margin-top: 40px; }
+        .chapter-emoji { font-size: 50px; display: block; }
+        .content-block { font-size: 1.1rem; line-height: 1.6; text-align: justify; white-space: pre-wrap; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
         
-        .progress-bar { width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 15px; display: none; }
+        .progress-bar { width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 15px; display: none; overflow: hidden; }
         .progress-fill { height: 100%; background: #00b894; width: 0%; transition: 0.3s; }
-        #status-msg { font-size: 12px; color: var(--accent); margin-top: 5px; text-align: center; font-weight: bold; }
+        #status-msg { font-size: 12px; color: red; margin-top: 5px; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
     <h2>📖 Ebook Flow</h2>
-    <p style="font-size: 11px; color: #666;">Gerador otimizado para copiar e colar no Microsoft Word.</p>
-    
     <label>Groq API Key:</label>
     <input type="password" id="apiKey" placeholder="gsk_...">
     
-    <label>Título Principal:</label>
-    <input type="text" id="title" value="20 Rituais de Axé e Prosperidade">
+    <label>Título:</label>
+    <input type="text" id="title" value="20 Rituais Sagrados">
     
-    <label>Instruções de Conteúdo:</label>
-    <textarea id="prompt" rows="5">Rituais de Candomblé e Umbanda para abrir caminhos, atrair dinheiro e fortalecer o amor. Explique o significado de cada elemento utilizado.</textarea>
+    <label>O que conter?</label>
+    <textarea id="prompt" rows="5">Rituais de Candomblé e Umbanda para amor e riqueza. Liste materiais e passo a passo.</textarea>
     
-    <label>Número de Capítulos/Rituais:</label>
-    <input type="number" id="qty" value="20" min="1" max="100">
+    <label>Quantidade:</label>
+    <input type="number" id="qty" value="20">
 
     <div class="progress-bar" id="pBox"><div class="progress-fill" id="pFill"></div></div>
-    <div id="status-msg">Pronto.</div>
+    <div id="status-msg"></div>
 
-    <button id="btnGen" onclick="generateStream()">Gerar Todo o Conteúdo</button>
-    <button id="btnCopy" class="copy-btn" onclick="copyEverything()" disabled>📋 COPIAR TODO O EBOOK</button>
+    <button id="btnGen" onclick="generateStream()">Gerar Conteúdo</button>
+    <button id="btnCopy" class="copy-btn" onclick="copyEverything()">📋 COPIAR EBOOK PARA O WORD</button>
 </div>
 
 <div class="main">
     <div id="ebook-stream">
-        <div style="text-align: center; color: #ccc; margin-top: 100px;">
-            <p style="font-size: 50px;">📄</p>
-            <p>O texto contínuo aparecerá aqui após a geração.</p>
-        </div>
+        <p style="text-align: center; color: #ccc;">Aguardando geração...</p>
     </div>
 </div>
 
@@ -77,7 +65,10 @@
         const basePrompt = document.getElementById('prompt').value;
         const total = parseInt(document.getElementById('qty').value);
 
-        if(!key) return alert("Insira a chave da Groq!");
+        if(!key.startsWith('gsk_')) {
+            showError("Chave inválida! Ela deve começar com 'gsk_'.");
+            return;
+        }
 
         const btn = document.getElementById('btnGen');
         const stream = document.getElementById('ebook-stream');
@@ -87,46 +78,37 @@
 
         btn.disabled = true;
         pBox.style.display = 'block';
-        
-        // Inicia com o Título do Livro
-        stream.innerHTML = `<div style="text-align:center; margin-bottom: 100px;">
-                                <h1 style="font-size: 48px; margin-bottom: 10px;">${mainTitle}</h1>
-                                <hr>
-                            </div>`;
+        status.style.color = "#6c5ce7";
+        status.innerText = "Iniciando...";
+        stream.innerHTML = `<h1 style="text-align:center; font-size:40px;">${mainTitle}</h1><hr>`;
 
         for(let i = 1; i <= total; i++) {
-            status.innerText = `Gerando capítulo ${i} de ${total}...`;
+            status.innerText = `Gerando página ${i} de ${total}...`;
             fill.style.width = `${(i/total)*100}%`;
 
             try {
                 const data = await callGroq(key, i, mainTitle, basePrompt);
-                
                 stream.innerHTML += `
                     <div class="chapter-header">
                         <span class="chapter-emoji">${data.emoji || '✨'}</span>
-                        <h2 class="chapter-title">Capítulo ${i}: ${data.nome}</h2>
+                        <h2 style="font-size: 24px;">${i}. ${data.nome}</h2>
                     </div>
                     <div class="content-block">
-                        <strong>Materiais Necessários:</strong>\n${data.materiais}\n\n
-                        <strong>Modo de Preparo e Ritual:</strong>\n${data.passo_a_passo}
+                        <strong>Materiais:</strong>\n${data.materiais}\n\n
+                        <strong>Passo a passo:</strong>\n${data.passo_a_passo}
                     </div>
-                    <p style="text-align:center; color:#eee;">***</p>
                 `;
-                
-                // Rola a tela para acompanhar a escrita
                 window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-
             } catch (err) {
-                console.error(err);
-                status.innerText = "Erro na API. Verifique sua chave ou conexão.";
+                showError("Erro na API Groq. Verifique se sua chave está ativa ou se atingiu o limite.");
                 btn.disabled = false;
                 return;
             }
         }
 
-        status.innerText = "✅ Conteúdo Gerado com Sucesso!";
+        status.innerText = "✅ Concluído!";
         btn.disabled = false;
-        document.getElementById('btnCopy').disabled = false;
+        document.getElementById('btnCopy').style.display = 'block';
     }
 
     async function callGroq(key, index, ebookTitle, context) {
@@ -140,16 +122,26 @@
                 model: "llama3-8b-8192",
                 messages: [{
                     role: "user",
-                    content: `Gere o capítulo ${index} do ebook "${ebookTitle}". Tema: ${context}. 
-                    Retorne em JSON: {"nome": "Título", "materiais": "lista", "passo_a_passo": "texto detalhado", "emoji": "um emoji temático"}`
+                    content: `Gere um ritual místico (${index}). Tema: ${context}. 
+                    Retorne estritamente este JSON: {"nome": "Título", "materiais": "lista", "passo_a_passo": "texto", "emoji": "um emoji"}`
                 }],
-                temperature: 0.7,
                 response_format: { type: "json_object" }
             })
         });
 
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error.message);
+        }
+
         const result = await response.json();
         return JSON.parse(result.choices[0].message.content);
+    }
+
+    function showError(msg) {
+        const status = document.getElementById('status-msg');
+        status.style.color = "red";
+        status.innerText = msg;
     }
 
     function copyEverything() {
@@ -158,16 +150,9 @@
         range.selectNode(container);
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(range);
-        
-        try {
-            document.execCommand('copy');
-            alert("Sucesso! Todo o conteúdo foi copiado. Agora abra o Word e pressione CTRL+V.");
-        } catch (err) {
-            alert("Erro ao copiar. Tente selecionar o texto com o mouse.");
-        }
-        window.getSelection().removeAllRanges();
+        document.execCommand('copy');
+        alert("Copiado! Agora cole no Word.");
     }
 </script>
-
 </body>
 </html>
