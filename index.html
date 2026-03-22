@@ -3,667 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ebook Creator Pro - Gerador Funcional com Groq</title>
+    <title>Ebook Ritual Maker - Groq Edition</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root { --primary: #2d3436; --accent: #6c5ce7; --bg: #dfe6e9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; }
+        
+        .sidebar { width: 350px; background: white; height: 100vh; padding: 25px; position: fixed; box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; }
+        .main { margin-left: 350px; flex: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        
+        input, textarea, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        button:hover { opacity: 0.9; }
+        button:disabled { background: #ccc; }
+
+        .copy-btn { background: #00b894; margin-top: 10px; }
+        
+        .ebook-page { 
+            background: white; width: 100%; max-width: 800px; padding: 40px; 
+            margin-bottom: 30px; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            line-height: 1.6; color: #2d3436;
         }
-
-        body {
-            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            min-height: 100vh;
-            padding: 30px;
-        }
-
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 25px;
-        }
-
-        .control-panel {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 25px;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            height: fit-content;
-            position: sticky;
-            top: 30px;
-        }
-
-        .control-panel h2 {
-            background: linear-gradient(135deg, #a855f7, #3b82f6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 1.6rem;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .api-box {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 20px;
-            border-left: 3px solid #a855f7;
-        }
-
-        .api-box label {
-            display: block;
-            margin-bottom: 8px;
-            color: #a855f7;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            background: #0f172a;
-            color: white;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #a855f7;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .slider-container {
-            margin: 20px 0;
-        }
-
-        .slider-container label {
-            display: block;
-            margin-bottom: 8px;
-            color: #94a3b8;
-            font-weight: 600;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            padding: 0;
-        }
-
-        .pages-value {
-            background: #a855f7;
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: white;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1rem;
-            margin-top: 12px;
-        }
-
-        .btn-generate {
-            background: linear-gradient(135deg, #a855f7, #3b82f6);
-            color: white;
-        }
-
-        .btn-copy {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .progress-area {
-            margin-top: 20px;
-            background: #334155;
-            height: 4px;
-            border-radius: 2px;
-            overflow: hidden;
-            display: none;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #a855f7, #3b82f6);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .status-msg {
-            margin-top: 15px;
-            font-size: 0.8rem;
-            text-align: center;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        .status-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .status-error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        .status-info { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
-
-        .info-hint {
-            font-size: 0.7rem;
-            color: #64748b;
-            margin-top: 8px;
-            text-align: center;
-        }
-
-        .ebook-viewer {
-            background: white;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .ebook-header {
-            background: #f8fafc;
-            padding: 20px 30px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .ebook-header h3 {
-            color: #1e293b;
-            font-size: 1.2rem;
-        }
-
-        .copy-all-btn {
-            background: #10b981;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            width: auto;
-            margin: 0;
-            font-size: 0.9rem;
-        }
-
-        .copy-all-btn:hover { background: #059669; }
-
-        .ebook-content {
-            padding: 30px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .page-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 20px;
-            padding: 35px;
-            margin-bottom: 30px;
-            page-break-after: always;
-        }
-
-        .cover-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-        }
-
-        .cover-card h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-
-        .page-title {
-            font-size: 1.6rem;
-            color: #4f46e5;
-            margin-bottom: 20px;
-            border-left: 5px solid #4f46e5;
-            padding-left: 20px;
-        }
-
-        .cover-card .page-title {
-            color: white;
-            border-left-color: white;
-        }
-
-        .emoji-section {
-            font-size: 2.5rem;
-            text-align: center;
-            margin: 20px 0;
-            letter-spacing: 12px;
-        }
-
-        .page-text {
-            line-height: 1.8;
-            color: #334155;
-            font-size: 1rem;
-            text-align: justify;
-        }
-
-        .cover-card .page-text {
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .page-footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px solid #e2e8f0;
-            color: #94a3b8;
-            font-size: 0.8rem;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 80px 40px;
-            color: #94a3b8;
-        }
-
-        .error-log {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 15px;
-            color: #dc2626;
-            font-size: 0.75rem;
-            display: none;
-        }
-
-        @media (max-width: 900px) {
-            body { padding: 15px; }
-            .main-container { grid-template-columns: 1fr; }
-            .control-panel { position: relative; top: 0; }
-        }
+        .emoji-header { font-size: 50px; text-align: center; margin-bottom: 20px; display: block; }
+        .page-title { color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .progress { width: 100%; height: 8px; background: #eee; border-radius: 4px; margin: 15px 0; display: none; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.3s; }
     </style>
 </head>
 <body>
 
-<div class="main-container">
-    <div class="control-panel">
-        <h2>📚 Ebook Creator Pro</h2>
-        
-        <div class="api-box">
-            <label>🔑 Groq API Key</label>
-            <input type="password" id="groqKey" placeholder="gsk_... | Obtenha em console.groq.com">
-            <div class="info-hint">✅ Gratuito e rápido. <a href="https://console.groq.com/keys" target="_blank" style="color:#a855f7;">Obter chave gratuita</a></div>
-        </div>
-        
-        <label>📖 Título do Ebook</label>
-        <input type="text" id="title" placeholder="Ex: O Poder da Produtividade com IA" value="Guia Prático de Produtividade com IA">
-        
-        <label>📝 Tema Principal</label>
-        <textarea id="theme" placeholder="Descreva o tema central do ebook">Inteligência Artificial aplicada à produtividade pessoal e profissional, com ferramentas práticas, técnicas avançadas e exemplos reais</textarea>
-        
-        <div class="slider-container">
-            <label>📄 Número de Páginas (3 a 30)</label>
-            <input type="range" id="pages" min="3" max="30" value="8">
-            <div style="text-align: center; margin-top: 8px;">
-                <span class="pages-value" id="pagesValue">8</span> páginas
-            </div>
-        </div>
-        
-        <div id="progressContainer" class="progress-area">
-            <div id="progressFill" class="progress-fill"></div>
-        </div>
-        <div id="statusMsg" class="status-msg"></div>
-        <div id="errorLog" class="error-log"></div>
-        
-        <button id="generateBtn" class="btn-generate" onclick="generateEbook()">✨ Gerar Ebook</button>
-        
-        <div class="info-hint" style="margin-top: 20px; background: rgba(168,85,247,0.1); padding: 12px; border-radius: 12px;">
-            💡 <strong>Como funciona:</strong> Cada página recebe um tópico ÚNICO. <br>
-            📌 Após gerar, clique em "Copiar Tudo" e cole no Word para salvar como PDF.
-        </div>
-    </div>
+<div class="sidebar">
+    <h2>📖 Criador de Ebook</h2>
+    <p style="font-size: 12px; color: #666;">Use apenas a API da Groq para melhores resultados.</p>
     
-    <div class="ebook-viewer">
-        <div class="ebook-header">
-            <h3>📖 Visualização do Ebook</h3>
-            <button id="copyAllBtn" class="copy-all-btn" onclick="copyAllContent()" disabled>📋 Copiar Todas as Páginas</button>
-        </div>
-        <div class="ebook-content" id="ebookContent">
-            <div class="empty-state">
-                <p>✨ Configure sua API Key da Groq e clique em "Gerar Ebook"</p>
-                <p style="font-size: 0.85rem; margin-top: 10px;">Cada página terá um tópico diferente, conteúdo único e emojis temáticos</p>
-            </div>
-        </div>
-    </div>
+    <label>Groq API Key:</label>
+    <input type="password" id="apiKey" placeholder="gsk_...">
+    
+    <label>Título:</label>
+    <input type="text" id="title" value="20 Rituais de Axé">
+    
+    <label>Prompt Base:</label>
+    <textarea id="prompt" rows="5">Rituais de Candomblé e Umbanda para amor e riqueza. Liste materiais e passo a passo.</textarea>
+    
+    <label>Quantidade de Páginas:</label>
+    <input type="number" id="qty" value="20">
+
+    <div class="progress" id="pBox"><div class="progress-fill" id="pFill"></div></div>
+    <p id="status" style="font-size: 13px; font-weight: bold;"></p>
+
+    <button id="btnGen" onclick="generate()">Gerar Conteúdo</button>
+    <button id="btnCopy" class="copy-btn" onclick="copyAllContent()" disabled>Copiar Todo o Ebook</button>
+</div>
+
+<div class="main" id="contentArea">
+    <div style="color: #999; margin-top: 100px;">O conteúdo gerado aparecerá aqui...</div>
 </div>
 
 <script>
-    let generatedPagesText = [];
-    let isGenerating = false;
-    let hasContent = false;
-    
-    document.getElementById('pages').addEventListener('input', function() {
-        document.getElementById('pagesValue').textContent = this.value;
-    });
-    
-    function showStatus(message, type) {
-        const el = document.getElementById('statusMsg');
-        el.textContent = message;
-        el.className = `status-msg status-${type}`;
-        console.log(`[${type}] ${message}`);
+    async function generate() {
+        const key = document.getElementById('apiKey').value;
+        const title = document.getElementById('title').value;
+        const promptBase = document.getElementById('prompt').value;
+        const qty = parseInt(document.getElementById('qty').value);
+        
+        if(!key) return alert("Insira a chave da Groq!");
+
+        const btn = document.getElementById('btnGen');
+        const area = document.getElementById('contentArea');
+        const fill = document.getElementById('pFill');
+        const box = document.getElementById('pBox');
+        const status = document.getElementById('status');
+
+        btn.disabled = true;
+        area.innerHTML = '';
+        box.style.display = 'block';
+
+        area.innerHTML = `<div class="ebook-page"><h1>${title}</h1><p>Manual Prático de Rituais</p></div>`;
+
+        for(let i = 1; i <= qty; i++) {
+            status.innerText = `Gerando página ${i}...`;
+            fill.style.width = `${(i/qty)*100}%`;
+
+            try {
+                const data = await callGroq(key, i, promptBase);
+                area.innerHTML += `
+                    <div class="ebook-page">
+                        <span class="emoji-header">${data.emoji}</span>
+                        <h2 class="page-title">${i}. ${data.nome}</h2>
+                        <p><strong>Materiais:</strong><br>${data.materiais}</p>
+                        <p><strong>Passo a Passo:</strong><br>${data.passo_a_passo}</p>
+                    </div>`;
+            } catch (e) {
+                console.error(e);
+                status.innerText = "Erro na API. Verifique a chave.";
+                break;
+            }
+        }
+
+        status.innerText = "✅ Concluído!";
+        btn.disabled = false;
+        document.getElementById('btnCopy').disabled = false;
     }
-    
-    function showError(errorMessage) {
-        const errorLog = document.getElementById('errorLog');
-        errorLog.innerHTML = `<strong>⚠️ Erro detectado:</strong> ${errorMessage}`;
-        errorLog.style.display = 'block';
-        setTimeout(() => {
-            errorLog.style.display = 'none';
-        }, 8000);
-    }
-    
-    function updateProgress(percent) {
-        const container = document.getElementById('progressContainer');
-        const fill = document.getElementById('progressFill');
-        container.style.display = 'block';
-        fill.style.width = `${percent}%`;
-    }
-    
-    function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
-    function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
-    function getEmojisForPage(pageNum, topic) {
-        const emojiSets = [
-            ['📖', '✨', '🎯', '🚀', '💡'],
-            ['🛠️', '🔧', '💻', '📱', '⚙️'],
-            ['🎯', '⚡', '💪', '📊', '🔑'],
-            ['✍️', '📝', '✅', '🎯', '💎'],
-            ['🏆', '📈', '⭐', '🎉', '💼'],
-            ['🔮', '🚀', '🌍', '💫', '🌟'],
-            ['💡', '✨', '📌', '🔑', '🎓'],
-            ['⚠️', '⚡', '💪', '🎯', '🔄'],
-            ['🤖', '🧠', '💡', '🔮', '⚙️'],
-            ['📚', '✨', '💡', '🎯', '🌟']
-        ];
-        const setIndex = (pageNum - 1) % emojiSets.length;
-        return emojiSets[setIndex].join(' ');
-    }
-    
-    async function callGroqAPI(apiKey, pageNumber, totalPages, pageTopic, bookTitle) {
+
+    async function callGroq(key, index, context) {
         const url = "https://api.groq.com/openai/v1/chat/completions";
-        
-        const systemPrompt = `Você é um escritor profissional de ebooks. Crie conteúdo de alta qualidade, único e original.`;
-        
-        const userPrompt = `Crie o conteúdo para a PÁGINA ${pageNumber} de ${totalPages} do ebook "${bookTitle}".
+        const prompt = `Gere o ritual ${index} sobre: ${context}. 
+        Retorne em JSON: {"nome": "Título", "materiais": "lista", "passo_a_passo": "texto", "emoji": "um emoji que represente o ritual"}`;
 
-TÓPICO ESPECÍFICO DESTA PÁGINA: ${pageTopic}
-
-REGRAS IMPORTANTES:
-1. O conteúdo deve ser COMPLETAMENTE ÚNICO e específico para este tópico
-2. Use linguagem profissional mas acessível
-3. Inclua exemplos práticos e insights valiosos
-4. O texto deve ter entre 200 e 350 palavras
-5. NÃO repita conteúdo de outras páginas
-
-Responda APENAS com um objeto JSON válido no formato:
-{
-    "title": "Título atraente para esta página (máximo 12 palavras)",
-    "content": "Conteúdo detalhado em parágrafos, com exemplos e dicas práticas"
-}`;
-        
-        const response = await fetch(url, {
+        const resp = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: "llama3-70b-8192",
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: userPrompt }
-                ],
-                temperature: 0.85,
-                max_tokens: 1200,
-                top_p: 0.95
+                model: "llama3-8b-8192",
+                messages: [{ role: "user", content: prompt }],
+                response_format: { type: "json_object" }
             })
         });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`);
-        }
-        
-        const data = await response.json();
-        
-        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-            throw new Error('Resposta inválida da API');
-        }
-        
-        let content = data.choices[0].message.content;
-        
-        // Extrair JSON
-        let jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            content = jsonMatch[0];
-        }
+
+        const json = await resp.json();
+        return JSON.parse(json.choices[0].message.content);
+    }
+
+    function copyAllContent() {
+        const area = document.getElementById('contentArea');
+        const range = document.createRange();
+        range.selectNode(area);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
         
         try {
-            const parsed = JSON.parse(content);
-            return {
-                title: parsed.title || `${pageTopic}`,
-                content: parsed.content || `Conteúdo sobre ${pageTopic}. Explore este tema fascinante.`
-            };
-        } catch (e) {
-            console.error('Erro ao parsear JSON:', content);
-            return {
-                title: pageTopic,
-                content: content.replace(/[{}]/g, '').trim()
-            };
+            document.execCommand('copy');
+            alert("Todo o conteúdo foi copiado! Agora basta colar no seu documento Word.");
+        } catch (err) {
+            alert("Erro ao copiar. Tente selecionar manualmente.");
         }
-    }
-    
-    async function generateEbook() {
-        const apiKey = document.getElementById('groqKey').value.trim();
-        if (!apiKey) {
-            showStatus('❌ Insira sua API Key da Groq', 'error');
-            showError('Por favor, insira uma chave API válida da Groq');
-            return;
-        }
-        
-        if (isGenerating) {
-            showStatus('⏳ Geração em andamento...', 'info');
-            return;
-        }
-        
-        isGenerating = true;
-        const generateBtn = document.getElementById('generateBtn');
-        const copyBtn = document.getElementById('copyAllBtn');
-        generateBtn.disabled = true;
-        copyBtn.disabled = true;
-        
-        const bookTitle = document.getElementById('title').value.trim();
-        const mainTheme = document.getElementById('theme').value.trim();
-        const totalPages = parseInt(document.getElementById('pages').value);
-        
-        if (!bookTitle) {
-            showStatus('❌ Preencha o título do ebook', 'error');
-            isGenerating = false;
-            generateBtn.disabled = false;
-            return;
-        }
-        
-        if (!mainTheme) {
-            showStatus('❌ Preencha o tema do ebook', 'error');
-            isGenerating = false;
-            generateBtn.disabled = false;
-            return;
-        }
-        
-        const ebookContainer = document.getElementById('ebookContent');
-        ebookContainer.innerHTML = '';
-        generatedPagesText = [];
-        
-        showStatus(`🚀 Iniciando geração de ${totalPages} páginas...`, 'info');
-        updateProgress(0);
-        
-        // Lista de tópicos únicos para cada página
-        const topicsList = [
-            `Introdução: O que é e por que é importante - ${mainTheme.substring(0, 40)}`,
-            `Ferramentas essenciais de IA para produtividade`,
-            `Técnicas avançadas para automatizar tarefas`,
-            `Como integrar IA no seu dia a dia`,
-            `Cases reais: exemplos práticos de sucesso`,
-            `Dicas práticas para começar a usar IA hoje`,
-            `Desafios comuns e como superá-los`,
-            `O futuro da produtividade com IA`,
-            `Ferramentas gratuitas vs pagas`,
-            `Como medir resultados com IA`,
-            `IA para criatividade e inovação`,
-            `Ética e responsabilidade no uso de IA`,
-            `Personalização de IA para suas necessidades`,
-            `Combinando ferramentas de IA`,
-            `Conclusão e próximos passos`
-        ];
-        
-        // Capa
-        const coverHTML = `
-            <div class="page-card cover-card">
-                <div class="emoji-section">📚 ✨ 🚀 💡 🎯</div>
-                <h1>${escapeHtml(bookTitle)}</h1>
-                <div class="page-text">
-                    <p>${escapeHtml(mainTheme)}</p>
-                    <p style="margin-top: 20px; font-size: 0.9rem;">Um guia completo para transformar sua produtividade</p>
-                </div>
-                <div class="page-footer">Gerado com Groq AI • ${new Date().getFullYear()}</div>
-            </div>
-        `;
-        ebookContainer.innerHTML = coverHTML;
-        generatedPagesText.push(`📚 ${bookTitle}\n${'='.repeat(50)}\n${mainTheme}\n\n`);
-        
-        // Gerar cada página
-        for (let i = 0; i < totalPages; i++) {
-            const pageNum = i + 1;
-            const percent = ((pageNum) / totalPages) * 100;
-            updateProgress(percent);
-            
-            // Selecionar tópico (se acabarem, cria um genérico)
-            let pageTopic;
-            if (i < topicsList.length) {
-                pageTopic = topicsList[i];
-            } else {
-                pageTopic = `Aprofundamento ${pageNum}: Explorando aspectos avançados de ${mainTheme.substring(0, 50)}`;
-            }
-            
-            showStatus(`📄 Gerando página ${pageNum} de ${totalPages}: ${pageTopic.substring(0, 50)}...`, 'info');
-            
-            try {
-                const pageData = await callGroqAPI(apiKey, pageNum, totalPages, pageTopic, bookTitle);
-                const emojis = getEmojisForPage(pageNum, pageData.title);
-                
-                const pageHTML = `
-                    <div class="page-card">
-                        <div class="emoji-section">${emojis}</div>
-                        <div class="page-title">${escapeHtml(pageData.title)}</div>
-                        <div class="page-text">
-                            ${escapeHtml(pageData.content).replace(/\n/g, '<br>')}
-                        </div>
-                        <div class="page-footer">${escapeHtml(bookTitle)} • Página ${pageNum} de ${totalPages}</div>
-                    </div>
-                `;
-                
-                ebookContainer.innerHTML += pageHTML;
-                generatedPagesText.push(`\n\n${'='.repeat(60)}\n📄 PÁGINA ${pageNum} - ${pageData.title}\n${'='.repeat(60)}\n\n${pageData.content}\n`);
-                
-                await delay(500);
-                
-            } catch (error) {
-                console.error(`Erro na página ${pageNum}:`, error);
-                showStatus(`⚠️ Erro na página ${pageNum}, usando conteúdo alternativo...`, 'info');
-                showError(`Página ${pageNum}: ${error.message}`);
-                
-                const emojis = getEmojisForPage(pageNum, pageTopic);
-                const fallbackContent = `Explore os conceitos fundamentais sobre ${pageTopic.toLowerCase()}. 
-
-Este tópico é essencial para compreender ${mainTheme.substring(0, 60)}. 
-
-Aqui estão os pontos principais:
-• Conceitos básicos e fundamentação teórica
-• Aplicações práticas no dia a dia
-• Benefícios e resultados esperados
-• Próximos passos para aprofundamento
-
-Continue sua jornada de aprendizado e descubra como aplicar estes conhecimentos na prática para obter resultados transformadores.`;
-                
-                const fallbackHTML = `
-                    <div class="page-card">
-                        <div class="emoji-section">${emojis}</div>
-                        <div class="page-title">${escapeHtml(pageTopic)}</div>
-                        <div class="page-text">
-                            ${escapeHtml(fallbackContent).replace(/\n/g, '<br>')}
-                        </div>
-                        <div class="page-footer">${escapeHtml(bookTitle)} • Página ${pageNum} de ${totalPages}</div>
-                    </div>
-                `;
-                ebookContainer.innerHTML += fallbackHTML;
-                generatedPagesText.push(`\n\n${'='.repeat(60)}\n📄 PÁGINA ${pageNum} - ${pageTopic}\n${'='.repeat(60)}\n\n${fallbackContent}\n`);
-            }
-        }
-        
-        updateProgress(100);
-        showStatus(`✅ Ebook "${bookTitle}" gerado com sucesso! ${totalPages} páginas criadas. Clique em "Copiar Todas as Páginas" para colar no Word.`, 'success');
-        copyBtn.disabled = false;
-        hasContent = true;
-        isGenerating = false;
-        generateBtn.disabled = false;
-    }
-    
-    function copyAllContent() {
-        if (!hasContent || generatedPagesText.length === 0) {
-            showStatus('❌ Nenhum ebook gerado para copiar', 'error');
-            return;
-        }
-        
-        const bookTitle = document.getElementById('title').value.trim();
-        const finalText = `📚 ${bookTitle}\n${'='.repeat(50)}\nGerado em: ${new Date().toLocaleDateString('pt-BR')}\n${'='.repeat(50)}\n${generatedPagesText.join('')}\n\n✨ Fim do ebook ✨`;
-        
-        navigator.clipboard.writeText(finalText).then(() => {
-            showStatus('✅ Todas as páginas foram copiadas! Cole no Word (Ctrl+V) e salve como PDF.', 'success');
-            const copyBtn = document.getElementById('copyAllBtn');
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = '✓ Copiado!';
-            setTimeout(() => {
-                copyBtn.textContent = originalText;
-            }, 2000);
-        }).catch(err => {
-            console.error('Erro ao copiar:', err);
-            showStatus('❌ Erro ao copiar. Tente selecionar manualmente.', 'error');
-        });
+        window.getSelection().removeAllRanges();
     }
 </script>
 
