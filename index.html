@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ebook Creator Pro - Gerador de Páginas Únicas com IA</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <title>Ebook Creator - Gerador de Conteúdo com Groq + Emojis</title>
     <style>
         * {
             margin: 0;
@@ -13,84 +12,107 @@
         }
 
         body {
-            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
-            background: #0a0a2a;
-            display: flex;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 30px;
         }
-        
-        .sidebar {
-            width: 400px;
-            background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
-            padding: 28px;
-            height: 100vh;
-            position: fixed;
-            overflow-y: auto;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.4);
-            z-index: 100;
-            border-right: 1px solid rgba(139, 92, 246, 0.3);
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 25px;
         }
-        
-        .sidebar h2 {
-            background: linear-gradient(135deg, #a855f7, #3b82f6);
+
+        /* Painel de Controle */
+        .control-panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 30px;
+        }
+
+        .control-panel h2 {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
-        
-        .api-card {
-            background: rgba(255,255,255,0.05);
+
+        .api-box {
+            background: rgba(0,0,0,0.3);
             border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: 18px;
+            margin-bottom: 25px;
+            border-left: 3px solid #00d4ff;
         }
-        
-        .api-card label {
+
+        .api-box label {
             display: block;
-            margin-bottom: 6px;
-            color: #c4b5fd;
-            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: #00d4ff;
             font-weight: 600;
+            font-size: 0.85rem;
         }
-        
-        .api-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        
-        .api-selector button {
-            flex: 1;
-            padding: 8px;
-            margin-top: 0;
-            font-size: 0.8rem;
-            background: #334155;
-        }
-        
-        .api-selector button.active {
-            background: linear-gradient(135deg, #a855f7, #3b82f6);
-        }
-        
-        input, textarea, select {
+
+        input, textarea {
             width: 100%;
-            padding: 12px;
+            padding: 12px 15px;
             border-radius: 12px;
-            border: 1px solid #334155;
-            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4);
             color: white;
             font-family: inherit;
-            margin-bottom: 12px;
+            font-size: 0.9rem;
         }
-        
+
         input:focus, textarea:focus {
             outline: none;
-            border-color: #a855f7;
-            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+            border-color: #00d4ff;
         }
-        
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .pages-value {
+            text-align: center;
+            background: #00d4ff;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+
         button {
             width: 100%;
             padding: 14px;
@@ -102,236 +124,248 @@
             font-size: 1rem;
             margin-top: 12px;
         }
-        
+
         .btn-generate {
-            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
             color: white;
         }
-        
-        .btn-download {
+
+        .btn-copy {
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
         }
-        
+
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         .progress-area {
             margin-top: 20px;
-            background: #334155;
-            height: 6px;
-            border-radius: 3px;
+            background: rgba(255,255,255,0.1);
+            height: 4px;
+            border-radius: 2px;
             overflow: hidden;
             display: none;
         }
-        
+
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #a855f7, #3b82f6);
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
             width: 0%;
             transition: width 0.3s;
         }
-        
+
         .status-msg {
-            margin-top: 12px;
+            margin-top: 15px;
             font-size: 0.8rem;
             text-align: center;
-            padding: 8px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 10px;
         }
-        
+
         .status-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
         .status-error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        .status-info { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
-        
+        .status-info { background: rgba(0, 212, 255, 0.2); color: #00d4ff; }
+
         .info-hint {
             font-size: 0.7rem;
-            color: #94a3b8;
-            margin-top: 4px;
-        }
-        
-        .preview-area {
-            margin-left: 400px;
-            padding: 40px;
-            width: calc(100% - 400px);
-            background: #1a1a2e;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .pdf-page {
-            width: 210mm;
-            background: white;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            page-break-after: always;
-            box-sizing: border-box;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .pdf-cover {
-            background: linear-gradient(135deg, #a855f7, #3b82f6);
-            color: white;
-            padding: 60px 40px;
+            color: #888;
+            margin-top: 8px;
             text-align: center;
-            min-height: 297mm;
+        }
+
+        /* Área de Visualização do Ebook */
+        .ebook-viewer {
+            background: white;
+            border-radius: 24px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+
+        .ebook-header {
+            background: #f8fafc;
+            padding: 20px 30px;
+            border-bottom: 2px solid #e2e8f0;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        
-        .pdf-cover h1 {
-            font-size: 3rem;
+
+        .ebook-header h3 {
+            color: #1e293b;
+            font-size: 1.2rem;
+        }
+
+        .copy-all-btn {
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .copy-all-btn:hover {
+            background: #059669;
+        }
+
+        .ebook-content {
+            padding: 30px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Estilo das Páginas para Visualização e Cópia */
+        .page-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            page-break-after: always;
+        }
+
+        .cover-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cover-card h1 {
+            font-size: 2.5rem;
             margin-bottom: 20px;
-            word-wrap: break-word;
         }
-        
-        .pdf-content {
-            padding: 45px 40px;
-        }
-        
-        .pdf-content h2 {
-            color: #a855f7;
+
+        .page-title {
             font-size: 1.8rem;
-            margin-bottom: 20px;
-            border-left: 5px solid #a855f7;
+            color: #4f46e5;
+            margin-bottom: 25px;
+            border-left: 5px solid #4f46e5;
             padding-left: 20px;
         }
-        
-        .pdf-image {
-            width: 100%;
-            max-width: 100%;
-            height: auto;
-            margin: 25px 0;
-            border-radius: 12px;
-            display: block;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+        .cover-card .page-title {
+            color: white;
+            border-left-color: white;
         }
-        
-        .pdf-text {
+
+        .emoji-section {
+            font-size: 3rem;
+            text-align: center;
+            margin: 25px 0;
+            letter-spacing: 15px;
+        }
+
+        .page-text {
             line-height: 1.8;
-            color: #1f2937;
+            color: #334155;
             font-size: 1rem;
             text-align: justify;
         }
-        
-        .pdf-footer {
+
+        .cover-card .page-text {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .page-footer {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 35px;
             padding-top: 15px;
-            border-top: 1px solid #e5e7eb;
-            color: #6b7280;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
             font-size: 0.8rem;
         }
-        
-        @media (max-width: 900px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            .preview-area {
-                margin-left: 0;
-                width: 100%;
-                padding: 20px;
-            }
-            .pdf-page {
-                width: 100%;
-            }
+
+        .cover-card .page-footer {
+            border-top-color: rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.7);
         }
-        
-        @media print {
-            body { background: white; }
-            .sidebar, .status-msg, .progress-area { display: none; }
-            .preview-area { margin: 0; padding: 0; background: white; }
-            .pdf-page { box-shadow: none; margin: 0; page-break-after: always; }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 900px) {
+            body { padding: 15px; }
+            .main-container { grid-template-columns: 1fr; }
+            .control-panel { position: relative; top: 0; }
         }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2>📖 Ebook Creator Pro</h2>
-    
-    <div class="api-card">
-        <label>🤖 Escolha a IA</label>
-        <div class="api-selector">
-            <button id="selectGemini" onclick="selectAPI('gemini')" class="active">Gemini (Texto+Imagem)</button>
-            <button id="selectGroq" onclick="selectAPI('groq')">Groq (Apenas Texto)</button>
-        </div>
+<div class="main-container">
+    <!-- Painel de Controle -->
+    <div class="control-panel">
+        <h2>📚 Ebook Creator</h2>
         
-        <div id="geminiSection">
-            <label>🔑 Google Gemini API Key</label>
-            <input type="password" id="geminiKey" placeholder="Cole sua chave do Google AI Studio">
-            <div class="info-hint">Obtenha em: <a href="https://aistudio.google.com/apikey" target="_blank" style="color: #a855f7;">aistudio.google.com/apikey</a></div>
-        </div>
-        
-        <div id="groqSection" style="display: none;">
+        <div class="api-box">
             <label>🔑 Groq API Key</label>
-            <input type="password" id="groqKey" placeholder="Cole sua chave da Groq Cloud">
-            <div class="info-hint">Obtenha em: <a href="https://console.groq.com/keys" target="_blank" style="color: #a855f7;">console.groq.com/keys</a></div>
+            <input type="password" id="groqKey" placeholder="gsk_... | Obtenha em console.groq.com">
+            <div class="info-hint">✅ Gratuito e rápido. Cadastre-se em <a href="https://console.groq.com/keys" target="_blank" style="color:#00d4ff;">console.groq.com</a></div>
+        </div>
+        
+        <label>📖 Título do Ebook</label>
+        <input type="text" id="title" value="Guia Prático de Produtividade com IA" placeholder="Ex: O Poder do Hábito">
+        
+        <label>📝 Tema do Conteúdo</label>
+        <textarea id="prompt" placeholder="Descreva o tema principal. Cada página terá um aspecto diferente deste tema.">Crie um ebook sobre produtividade com inteligência artificial. Aborde: introdução, ferramentas práticas, técnicas avançadas, cases de sucesso, dicas de implementação, desafios, futuro da IA, conclusão e recursos extras.</textarea>
+        
+        <div class="slider-container">
+            <label>📄 Número de Páginas (3 a 40)</label>
+            <input type="range" id="pages" min="3" max="40" value="12">
+            <div style="text-align: center; margin-top: 8px;">
+                <span class="pages-value" id="pagesValue">12</span> páginas
+            </div>
+        </div>
+        
+        <div id="progressContainer" class="progress-area">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div id="statusMsg" class="status-msg"></div>
+        
+        <button id="generateBtn" class="btn-generate" onclick="generateEbook()">✨ Gerar Ebook</button>
+        
+        <div class="info-hint" style="margin-top: 20px; background: rgba(0,212,255,0.1); padding: 12px; border-radius: 12px;">
+            💡 <strong>Dica:</strong> Após gerar, use o botão "Copiar Tudo" para colar no Word e salvar como PDF. <br>
+            📌 Os emojis são gerados automaticamente de acordo com o tema de cada página!
         </div>
     </div>
     
-    <label>📚 Título do Ebook</label>
-    <input type="text" id="title" value="Guia Prático de Produtividade com IA" placeholder="Ex: O Poder do Hábito">
-    
-    <label>📝 Descrição do Conteúdo</label>
-    <textarea id="prompt" rows="4" placeholder="Descreva detalhadamente o que cada página deve abordar. Ex: Página 1: Introdução sobre IA; Página 2: Ferramentas de IA; Página 3: Como aplicar no dia a dia...">Crie um ebook sobre produtividade com IA. Cada página deve abordar um tema único e específico. Comece com introdução, depois ferramentas práticas, técnicas avançadas, cases de sucesso, dicas de implementação, desafios comuns, futuro da IA, conclusão e recursos extras.</textarea>
-    
-    <label>📄 Número de Páginas (3 a 50)</label>
-    <input type="range" id="pages" min="3" max="50" value="10">
-    <div style="text-align: center; margin: 5px 0 15px;"><span id="pagesValue">10</span> páginas de conteúdo único</div>
-    
-    <div id="progressContainer" class="progress-area">
-        <div id="progressFill" class="progress-fill"></div>
-    </div>
-    <div id="statusMsg" class="status-msg"></div>
-    
-    <button id="generateBtn" class="btn-generate" onclick="generateEbook()">✨ Gerar Ebook Página por Página</button>
-    <button id="downloadBtn" class="btn-download" onclick="downloadPDF()" disabled>📥 Baixar PDF Completo</button>
-    
-    <div class="info-hint" style="margin-top: 20px; text-align: center; background: rgba(168,85,247,0.1); padding: 10px; border-radius: 8px;">
-        ⚡ Cada página é gerada com conteúdo ÚNICO e específico.<br>
-        O prompt é usado para direcionar o tema de CADA página individualmente.
-    </div>
-</div>
-
-<div class="preview-area" id="previewArea">
-    <div style="text-align: center; padding: 60px; color: #94a3b8;">
-        <p>✨ Configure sua chave de API e clique em "Gerar Ebook"</p>
-        <p style="font-size: 0.8rem; margin-top: 10px;">Cada página terá conteúdo único, título específico e imagem ilustrativa</p>
+    <!-- Visualização do Ebook -->
+    <div class="ebook-viewer">
+        <div class="ebook-header">
+            <h3>📖 Visualização do Ebook</h3>
+            <button id="copyAllBtn" class="copy-all-btn" onclick="copyAllContent()" disabled>📋 Copiar Todas as Páginas</button>
+        </div>
+        <div class="ebook-content" id="ebookContent">
+            <div class="empty-state">
+                <p>✨ Configure sua API Key da Groq e clique em "Gerar Ebook"</p>
+                <p style="font-size: 0.85rem; margin-top: 10px;">Cada página terá conteúdo único, título específico e emojis temáticos</p>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    let currentAPI = 'gemini';
-    let generatedPages = [];
+    let generatedPagesData = [];
     let isGenerating = false;
     let hasContent = false;
     
     document.getElementById('pages').addEventListener('input', function() {
         document.getElementById('pagesValue').textContent = this.value;
     });
-    
-    function selectAPI(api) {
-        currentAPI = api;
-        document.getElementById('selectGemini').classList.remove('active');
-        document.getElementById('selectGroq').classList.remove('active');
-        if (api === 'gemini') {
-            document.getElementById('selectGemini').classList.add('active');
-            document.getElementById('geminiSection').style.display = 'block';
-            document.getElementById('groqSection').style.display = 'none';
-        } else {
-            document.getElementById('selectGroq').classList.add('active');
-            document.getElementById('geminiSection').style.display = 'none';
-            document.getElementById('groqSection').style.display = 'block';
-        }
-    }
     
     function showStatus(message, type) {
         const el = document.getElementById('statusMsg');
@@ -357,25 +391,68 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     
-    // Gerar texto com Gemini
-    async function callGeminiText(apiKey, prompt) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.85, maxOutputTokens: 1000 }
-            })
-        });
-        if (!response.ok) throw new Error(`Gemini Error: ${response.status}`);
-        const data = await response.json();
-        return data.candidates[0].content.parts[0].text;
+    // Gerar emojis baseados no tema da página
+    function generateEmojisForPage(pageTitle, pageContent, pageNumber) {
+        const emojiGroups = {
+            produtividade: ['⚡', '🚀', '💪', '📊', '🎯', '✅', '⏰', '📈'],
+            inteligencia: ['🧠', '🤖', '💡', '🔮', '⚙️', '📡', '🔬', '💻'],
+            ferramentas: ['🛠️', '🔧', '📱', '💻', '🖥️', '📲', '⚙️', '🔨'],
+            futuro: ['🔮', '🌍', '🚀', '⭐', '🌟', '💫', '🌌', '🛸'],
+            dicas: ['💡', '✨', '📌', '🔑', '💎', '🎓', '📚', '✍️'],
+            sucesso: ['🏆', '🎉', '🥇', '⭐', '💎', '💰', '📈', '🎯'],
+            desafios: ['⚠️', '🔍', '⚡', '🎯', '🔄', '💪', '🧗', '🌊'],
+            padrao: ['📖', '✨', '🌟', '💡', '🎯', '📚', '🔍', '💎']
+        };
+        
+        // Escolher grupo baseado no conteúdo
+        let selectedGroup = emojiGroups.padrao;
+        const lowerContent = (pageTitle + ' ' + pageContent).toLowerCase();
+        
+        if (lowerContent.includes('produt') || lowerContent.includes('tempo') || lowerContent.includes('foco')) {
+            selectedGroup = emojiGroups.produtividade;
+        } else if (lowerContent.includes('ia') || lowerContent.includes('intelig') || lowerContent.includes('ia') || lowerContent.includes('robot')) {
+            selectedGroup = emojiGroups.inteligencia;
+        } else if (lowerContent.includes('ferrament') || lowerContent.includes('app') || lowerContent.includes('software')) {
+            selectedGroup = emojiGroups.ferramentas;
+        } else if (lowerContent.includes('futuro') || lowerContent.includes('tendência') || lowerContent.includes('próximo')) {
+            selectedGroup = emojiGroups.futuro;
+        } else if (lowerContent.includes('dica') || lowerContent.includes('como fazer') || lowerContent.includes('passo')) {
+            selectedGroup = emojiGroups.dicas;
+        } else if (lowerContent.includes('sucesso') || lowerContent.includes('resultado') || lowerContent.includes('conquista')) {
+            selectedGroup = emojiGroups.sucesso;
+        } else if (lowerContent.includes('desafio') || lowerContent.includes('dificuldade') || lowerContent.includes('obstáculo')) {
+            selectedGroup = emojiGroups.desafios;
+        }
+        
+        // Selecionar 5 emojis diferentes
+        const shuffled = [...selectedGroup];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled.slice(0, 6).join(' ');
     }
     
-    // Gerar texto com Groq
-    async function callGroqText(apiKey, prompt) {
+    // Chamar Groq API
+    async function callGroq(apiKey, pageNumber, totalPages, bookTitle, theme) {
         const url = "https://api.groq.com/openai/v1/chat/completions";
+        
+        const prompt = `Você é um escritor profissional de ebooks. Crie o conteúdo para a PÁGINA ${pageNumber} de ${totalPages} do ebook "${bookTitle}".
+
+Tema geral do ebook: ${theme}
+
+IMPORTANTE: Esta é a PÁGINA ${pageNumber} de ${totalPages}. Crie um conteúdo COMPLETAMENTE ÚNICO e DIFERENTE das outras páginas. Cada página deve abordar um ASPECTO DISTINTO do tema.
+
+A página ${pageNumber} deve ter um foco específico. Seja criativo, variado e evite repetições.
+
+Responda APENAS com um JSON válido no formato:
+{
+    "title": "Título específico e atraente para esta página (máximo 10 palavras)",
+    "content": "Conteúdo único com 200-300 palavras, bem estruturado, abordando o tema específico desta página. Use parágrafos, exemplos práticos, dicas e insights valiosos."
+}
+
+O conteúdo deve ser RICO, INFORMATIVO e NUNCA REPETIR o conteúdo de outras páginas.`;
+        
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -389,111 +466,33 @@
                 max_tokens: 1000
             })
         });
-        if (!response.ok) throw new Error(`Groq Error: ${response.status}`);
-        const data = await response.json();
-        return data.choices[0].message.content;
-    }
-    
-    // Gerar imagem com Gemini Imagen
-    async function generateImageWithGemini(apiKey, description, pageTitle) {
-        try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateContent?key=${apiKey}`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `Ilustração profissional para ebook: ${description}. Relacionado a: ${pageTitle}. Estilo moderno, cores vibrantes, alta qualidade.`
-                        }]
-                    }]
-                })
-            });
-            if (response.ok) {
-                const data = await response.json();
-                if (data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data) {
-                    return `data:image/png;base64,${data.candidates[0].content.parts[0].inlineData.data}`;
-                }
-            }
-        } catch (e) {}
-        return generatePlaceholderImage(pageTitle);
-    }
-    
-    function generatePlaceholderImage(title) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 800;
-        canvas.height = 500;
-        const ctx = canvas.getContext('2d');
-        const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        grad.addColorStop(0, '#667eea');
-        grad.addColorStop(1, '#764ba2');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 32px "Segoe UI"';
-        ctx.textAlign = 'center';
-        ctx.fillText(title.substring(0, 35), canvas.width/2, canvas.height/2);
-        ctx.font = '18px system-ui';
-        ctx.fillStyle = '#f0f0f0';
-        ctx.fillText('Página Ilustrativa', canvas.width/2, canvas.height - 60);
-        return canvas.toDataURL('image/jpeg', 0.9);
-    }
-    
-    // Gerar UMA PÁGINA com conteúdo ÚNICO
-    async function generateSinglePage(apiKey, pageNumber, totalPages, bookTitle, theme, apiType) {
-        // Prompt específico para cada página - GARANTE CONTEÚDO ÚNICO
-        const pagePrompt = `Você é um escritor profissional de ebooks. Crie o conteúdo para a PÁGINA ${pageNumber} de ${totalPages} do ebook "${bookTitle}".
-
-Tema geral do ebook: ${theme}
-
-IMPORTANTE: Esta é a PÁGINA ${pageNumber} - crie um conteúdo ESPECÍFICO e ÚNICO para esta página. NÃO repita conteúdo de outras páginas.
-
-A página ${pageNumber} deve abordar um ASPECTO DIFERENTE do tema. Seja criativo e variado.
-
-Responda APENAS com um JSON válido no formato:
-{
-    "title": "Título específico e atraente para esta página (máximo 10 palavras)",
-    "content": "Conteúdo único com 200-300 palavras, bem estruturado, abordando o tema específico desta página. Use parágrafos, exemplos práticos e insights valiosos.",
-    "image_description": "Descrição artística em português para ilustrar esta página (máximo 15 palavras)"
-}
-
-O conteúdo deve ser RICO, VARIADO e NÃO REPETITIVO. Cada página deve ser única.`;
         
-        let responseText;
-        if (apiType === 'gemini') {
-            responseText = await callGeminiText(apiKey, pagePrompt);
-        } else {
-            responseText = await callGroqText(apiKey, pagePrompt);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Groq Error: ${response.status} - ${errorData.error?.message || 'Unknown'}`);
         }
         
-        // Extrair JSON
-        let jsonStr = responseText;
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) jsonStr = jsonMatch[0];
+        const data = await response.json();
+        let content = data.choices[0].message.content;
         
-        const parsed = JSON.parse(jsonStr);
+        // Extrair JSON
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) content = jsonMatch[0];
+        
+        const parsed = JSON.parse(content);
         
         return {
             title: parsed.title || `Página ${pageNumber}`,
-            content: parsed.content || `Conteúdo único da página ${pageNumber} sobre ${bookTitle}.`,
-            imageDesc: parsed.image_description || `${bookTitle} - página ${pageNumber}`
+            content: parsed.content || `Conteúdo único da página ${pageNumber} sobre ${bookTitle}. Explore este tema fascinante e descubra novos conhecimentos.`
         };
     }
     
+    // Gerar ebook completo
     async function generateEbook() {
-        let apiKey;
-        if (currentAPI === 'gemini') {
-            apiKey = document.getElementById('geminiKey').value.trim();
-            if (!apiKey) {
-                showStatus('❌ Insira sua chave API do Google Gemini', 'error');
-                return;
-            }
-        } else {
-            apiKey = document.getElementById('groqKey').value.trim();
-            if (!apiKey) {
-                showStatus('❌ Insira sua chave API da Groq', 'error');
-                return;
-            }
+        const apiKey = document.getElementById('groqKey').value.trim();
+        if (!apiKey) {
+            showStatus('❌ Insira sua API Key da Groq (gratuita em console.groq.com)', 'error');
+            return;
         }
         
         if (isGenerating) {
@@ -503,9 +502,9 @@ O conteúdo deve ser RICO, VARIADO e NÃO REPETITIVO. Cada página deve ser úni
         
         isGenerating = true;
         const generateBtn = document.getElementById('generateBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
+        const copyBtn = document.getElementById('copyAllBtn');
         generateBtn.disabled = true;
-        downloadBtn.disabled = true;
+        copyBtn.disabled = true;
         
         const title = document.getElementById('title').value.trim();
         const theme = document.getElementById('prompt').value.trim();
@@ -518,114 +517,121 @@ O conteúdo deve ser RICO, VARIADO e NÃO REPETITIVO. Cada página deve ser úni
             return;
         }
         
-        const previewArea = document.getElementById('previewArea');
-        previewArea.innerHTML = '';
-        generatedPages = [];
+        const ebookContainer = document.getElementById('ebookContent');
+        ebookContainer.innerHTML = '';
+        generatedPagesData = [];
         
-        showStatus(`🚀 Gerando ${totalPages} páginas com conteúdo ÚNICO... Isso pode levar alguns minutos.`, 'info');
+        showStatus(`🚀 Gerando ${totalPages} páginas com conteúdo ÚNICO...`, 'info');
         updateProgress(0);
         
         // Capa
         const coverHTML = `
-            <div class="pdf-page pdf-cover">
+            <div class="page-card cover-card">
+                <div class="emoji-section">📚 ✨ 🎯 💡 🚀</div>
                 <h1>${escapeHtml(title)}</h1>
-                <p style="font-size: 1.2rem; margin-top: 20px;">${escapeHtml(theme.substring(0, 100))}</p>
-                <p style="margin-top: 60px; font-size: 0.9rem;">Gerado com ${currentAPI === 'gemini' ? 'Google Gemini AI' : 'Groq AI'} • ${new Date().getFullYear()}</p>
+                <div class="page-text">
+                    <p>${escapeHtml(theme.substring(0, 150))}...</p>
+                </div>
+                <div class="page-footer">Gerado com Groq AI • ${new Date().getFullYear()}</div>
             </div>
         `;
-        previewArea.innerHTML = coverHTML;
-        generatedPages.push(coverHTML);
+        ebookContainer.innerHTML = coverHTML;
+        generatedPagesData.push({ html: coverHTML, text: `TÍTULO: ${title}\n\n${theme}\n\n` });
         
-        // Gerar cada página com conteúdo ÚNICO
+        // Gerar cada página
         for (let i = 1; i <= totalPages; i++) {
             const percent = (i / totalPages) * 100;
             updateProgress(percent);
-            showStatus(`📄 Gerando página ${i} de ${totalPages}... (conteúdo único)`, 'info');
+            showStatus(`📄 Gerando página ${i} de ${totalPages}...`, 'info');
             
             try {
-                const pageData = await generateSinglePage(apiKey, i, totalPages, title, theme, currentAPI);
-                
-                let imageUrl;
-                if (currentAPI === 'gemini') {
-                    imageUrl = await generateImageWithGemini(apiKey, pageData.imageDesc, pageData.title);
-                } else {
-                    imageUrl = generatePlaceholderImage(pageData.title);
-                }
+                const pageData = await callGroq(apiKey, i, totalPages, title, theme);
+                const emojis = generateEmojisForPage(pageData.title, pageData.content, i);
                 
                 const pageHTML = `
-                    <div class="pdf-page pdf-content">
-                        <h2>${escapeHtml(pageData.title)}</h2>
-                        <img class="pdf-image" src="${imageUrl}" alt="${escapeHtml(pageData.title)}">
-                        <div class="pdf-text">
+                    <div class="page-card">
+                        <div class="emoji-section">${emojis}</div>
+                        <div class="page-title">${escapeHtml(pageData.title)}</div>
+                        <div class="page-text">
                             ${escapeHtml(pageData.content).replace(/\n/g, '<br>')}
                         </div>
-                        <div class="pdf-footer">${escapeHtml(title)} • Página ${i} de ${totalPages}</div>
+                        <div class="page-footer">${escapeHtml(title)} • Página ${i} de ${totalPages}</div>
                     </div>
                 `;
                 
-                previewArea.innerHTML += pageHTML;
-                generatedPages.push(pageHTML);
+                ebookContainer.innerHTML += pageHTML;
+                generatedPagesData.push({ 
+                    html: pageHTML, 
+                    text: `\n\n${'='.repeat(60)}\nPÁGINA ${i}\n${'='.repeat(60)}\n\nTÍTULO: ${pageData.title}\n\n${pageData.content}\n\n---\n`
+                });
                 
-                await delay(600);
+                await delay(500);
                 
             } catch (error) {
                 console.error(`Erro na página ${i}:`, error);
-                showStatus(`⚠️ Erro na página ${i}, criando versão alternativa...`, 'info');
+                showStatus(`⚠️ Erro na página ${i}, tentando novamente...`, 'info');
+                
+                const fallbackTitle = `${title} - Aspecto ${i}`;
+                const fallbackContent = `Explore os conceitos fundamentais relacionados a ${title}. Esta página aborda um aspecto único e importante deste tema transformador. Continue sua jornada de aprendizado e descubra novos insights valiosos.`;
+                const emojis = generateEmojisForPage(fallbackTitle, fallbackContent, i);
                 
                 const fallbackHTML = `
-                    <div class="pdf-page pdf-content">
-                        <h2>${escapeHtml(title)} - Página ${i}</h2>
-                        <img class="pdf-image" src="${generatePlaceholderImage(`Página ${i}`)}" alt="Página ${i}">
-                        <div class="pdf-text">
-                            <p>${escapeHtml(title)} - Conteúdo único da página ${i}.</p>
-                            <p style="margin-top: 15px;">Explore os conceitos e aplicações práticas relacionadas a este tema transformador.</p>
+                    <div class="page-card">
+                        <div class="emoji-section">${emojis}</div>
+                        <div class="page-title">${escapeHtml(fallbackTitle)}</div>
+                        <div class="page-text">
+                            ${escapeHtml(fallbackContent)}
                         </div>
-                        <div class="pdf-footer">${escapeHtml(title)} • Página ${i} de ${totalPages}</div>
+                        <div class="page-footer">${escapeHtml(title)} • Página ${i} de ${totalPages}</div>
                     </div>
                 `;
-                previewArea.innerHTML += fallbackHTML;
-                generatedPages.push(fallbackHTML);
+                ebookContainer.innerHTML += fallbackHTML;
+                generatedPagesData.push({ 
+                    html: fallbackHTML, 
+                    text: `\n\n${'='.repeat(60)}\nPÁGINA ${i}\n${'='.repeat(60)}\n\nTÍTULO: ${fallbackTitle}\n\n${fallbackContent}\n\n---\n`
+                });
             }
         }
         
         updateProgress(100);
-        showStatus(`✅ Ebook "${title}" gerado com sucesso! ${totalPages} páginas ÚNICAS criadas. Clique em "Baixar PDF" para salvar.`, 'success');
-        downloadBtn.disabled = false;
+        showStatus(`✅ Ebook "${title}" gerado com sucesso! ${totalPages} páginas únicas. Clique em "Copiar Todas as Páginas" para colar no Word.`, 'success');
+        copyBtn.disabled = false;
         hasContent = true;
         isGenerating = false;
         generateBtn.disabled = false;
     }
     
-    function downloadPDF() {
-        if (!hasContent) {
-            showStatus('❌ Nenhum ebook gerado. Clique em "Gerar Ebook" primeiro.', 'error');
+    // Copiar todo o conteúdo para área de transferência
+    function copyAllContent() {
+        if (!hasContent || generatedPagesData.length === 0) {
+            showStatus('❌ Nenhum ebook gerado para copiar', 'error');
             return;
         }
         
-        const element = document.getElementById('previewArea');
-        const downloadBtn = document.getElementById('downloadBtn');
+        // Construir texto completo para copiar
+        let fullText = '';
+        generatedPagesData.forEach(page => {
+            fullText += page.text;
+        });
         
-        showStatus('📄 Gerando PDF profissional... Aguarde.', 'info');
-        downloadBtn.disabled = true;
+        // Adicionar cabeçalho
+        const title = document.getElementById('title').value.trim();
+        const finalText = `📚 ${title}\n${'='.repeat(50)}\nGerado em: ${new Date().toLocaleDateString()}\n\n${fullText}`;
         
-        const opt = {
-            margin: [0, 0, 0, 0],
-            filename: `ebook_${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
-        };
-        
-        html2pdf().set(opt).from(element).save()
-            .then(() => {
-                showStatus('✅ PDF baixado com sucesso! Todas as páginas com conteúdo único.', 'success');
-                downloadBtn.disabled = false;
-            })
-            .catch((error) => {
-                console.error('PDF Error:', error);
-                showStatus('⚠️ Erro ao gerar PDF. Tente novamente.', 'error');
-                downloadBtn.disabled = false;
-            });
+        navigator.clipboard.writeText(finalText).then(() => {
+            showStatus('✅ Todas as páginas foram copiadas! Agora cole no Word e salve como PDF.', 'success');
+            
+            // Feedback visual no botão
+            const copyBtn = document.getElementById('copyAllBtn');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '✓ Copiado!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        }).catch(err => {
+            console.error('Erro ao copiar:', err);
+            showStatus('❌ Erro ao copiar. Tente selecionar manualmente.', 'error');
+        });
     }
 </script>
 
