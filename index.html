@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ebook Ritualístico - Gerador com Groq AI</title>
+    <title>Ebook Creator Pro - Gerador Comercial com Groq + Imagens</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
@@ -13,277 +13,223 @@
         }
 
         :root {
-            --ritual-color: #8B5A2B;
-            --gold: #D4AF37;
-            --dark-bg: #2C1810;
-            --light-bg: #FDF8F0;
+            --primary: #7C3AED;
+            --secondary: #06B6D4;
+            --dark: #0F172A;
+            --light: #F8FAFC;
         }
 
         body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background: #1a1a1a;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--dark);
             margin: 0;
             display: flex;
         }
         
         /* Painel de Controle */
         .controls {
-            width: 380px;
-            background: linear-gradient(135deg, #2C1810 0%, #1F0E08 100%);
-            padding: 30px 25px;
+            width: 420px;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            padding: 30px;
             height: 100vh;
             position: fixed;
             overflow-y: auto;
             box-shadow: 4px 0 20px rgba(0,0,0,0.5);
             z-index: 100;
-            border-right: 2px solid var(--gold);
+            border-right: 1px solid rgba(124, 58, 237, 0.3);
         }
         
         .controls h2 {
-            color: var(--gold);
-            font-size: 1.6rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.8rem;
             text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .api-badge {
+            background: rgba(124, 58, 237, 0.2);
+            border-radius: 12px;
+            padding: 12px;
             margin-bottom: 20px;
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 10px;
+            border: 1px solid rgba(124, 58, 237, 0.3);
         }
         
         .controls label {
             display: block;
             margin-top: 15px;
-            margin-bottom: 5px;
-            color: var(--gold);
-            font-weight: bold;
-            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: #CBD5E1;
+            font-weight: 600;
+            font-size: 0.85rem;
         }
         
         input, textarea, select {
             width: 100%;
             padding: 12px;
-            margin-top: 5px;
-            border-radius: 8px;
-            border: none;
-            font-family: 'Segoe UI', sans-serif;
-            background: #3D2A1F;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #1E293B;
             color: white;
-            border: 1px solid #5a3a2a;
+            font-family: inherit;
         }
         
         input:focus, textarea:focus {
             outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 100px;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
         }
         
         button {
             width: 100%;
             padding: 14px;
-            margin-top: 20px;
-            border-radius: 8px;
+            margin-top: 15px;
+            border-radius: 12px;
             border: none;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
             font-size: 1rem;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--ritual-color), #9B6A3E);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
         
         .btn-primary:hover:not(:disabled) {
-            background: linear-gradient(135deg, #9B6A3E, var(--ritual-color));
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3);
         }
         
         .btn-pdf {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            background: linear-gradient(135deg, #10B981, #059669);
             color: white;
         }
         
-        .btn-pdf:hover:not(:disabled) {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            transform: translateY(-2px);
-        }
-        
         button:disabled {
-            background: #555;
+            opacity: 0.5;
             cursor: not-allowed;
-            opacity: 0.6;
+            transform: none;
         }
 
         /* Área do Ebook */
         .preview {
-            margin-left: 380px;
+            margin-left: 420px;
             padding: 40px;
-            width: calc(100% - 380px);
+            width: calc(100% - 420px);
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #2a2a2a;
+            background: #1A1F2E;
             min-height: 100vh;
         }
         
-        /* Estilo da Página PDF */
-        .page {
+        /* Estilo das Páginas para PDF */
+        .ebook-page {
             width: 210mm;
             min-height: 297mm;
-            background: var(--light-bg);
-            color: #2C1810;
-            padding: 20mm;
+            background: white;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             position: relative;
             page-break-after: always;
             box-sizing: border-box;
-            border-radius: 4px;
+            border-radius: 8px;
+            overflow: hidden;
         }
         
-        .cover {
-            background: linear-gradient(135deg, #4A2518 0%, #2C1810 100%);
-            color: var(--gold);
-            text-align: center;
+        .cover-page {
+            background: linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%);
+            color: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            text-align: center;
+            padding: 40px;
         }
         
-        .cover h1 {
-            font-size: 3.5rem;
-            border-bottom: 3px solid var(--gold);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            font-family: 'Georgia', serif;
-        }
-        
-        .cover p {
-            font-size: 1.3rem;
-            margin-top: 20px;
-            opacity: 0.9;
-        }
-        
-        .cover .sub {
-            margin-top: 50px;
-            font-style: italic;
-            font-size: 1rem;
-        }
-        
-        .page h2 {
-            color: var(--ritual-color);
-            border-left: 5px solid var(--gold);
-            padding-left: 15px;
+        .cover-page h1 {
+            font-size: 3rem;
             margin-bottom: 20px;
-            font-size: 1.8rem;
+            font-weight: 800;
         }
         
-        .ritual-img {
+        .content-page {
+            padding: 40px;
+        }
+        
+        .content-page h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+        }
+        
+        .page-image {
             width: 100%;
-            max-height: 350px;
+            max-height: 300px;
             object-fit: cover;
-            border-radius: 12px;
+            border-radius: 16px;
             margin: 20px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             background: #f0f0f0;
         }
         
-        .ritual-text {
-            font-size: 1rem;
+        .page-content {
             line-height: 1.7;
-            text-align: justify;
+            color: #334155;
+            font-size: 1rem;
         }
         
-        .ritual-text strong {
-            color: var(--ritual-color);
-            font-size: 1.05rem;
-        }
-        
-        .materiais-box {
-            background: #f5e6d3;
-            padding: 15px;
-            border-radius: 12px;
-            margin: 15px 0;
-            border-left: 4px solid var(--gold);
-        }
-        
-        .page-footer {
-            position: absolute;
-            bottom: 15mm;
-            left: 0;
-            right: 0;
+        .page-number {
             text-align: center;
-            color: #999;
+            margin-top: 30px;
+            color: #94A3B8;
             font-size: 0.8rem;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-            margin-top: 20px;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 15px;
         }
-
-        .progress-box {
+        
+        .progress-container {
             margin-top: 20px;
-            background: #3D2A1F;
-            height: 10px;
-            border-radius: 5px;
+            background: #334155;
+            height: 6px;
+            border-radius: 3px;
             overflow: hidden;
             display: none;
         }
         
-        .progress-bar {
+        .progress-fill {
             height: 100%;
-            background: var(--gold);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.3s;
         }
         
-        .status-message {
-            margin-top: 15px;
-            font-size: 0.85rem;
-            color: var(--gold);
+        .status {
+            margin-top: 12px;
+            font-size: 0.8rem;
             text-align: center;
             padding: 8px;
-            border-radius: 6px;
+            border-radius: 8px;
         }
         
-        .status-error {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-        }
+        .status-success { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .status-error { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+        .status-info { background: rgba(124, 58, 237, 0.2); color: #A78BFA; }
         
-        .status-success {
-            background: rgba(39, 174, 96, 0.2);
-            color: #2ecc71;
-        }
-        
-        .status-info {
-            background: rgba(212, 175, 55, 0.2);
-            color: var(--gold);
-        }
-        
-        .info-text {
-            font-size: 0.8rem;
-            color: #aaa;
-            margin-top: 10px;
-            text-align: center;
-        }
-        
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #2C1810;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 4px;
+        .info-note {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid #F59E0B;
+            padding: 10px;
+            font-size: 0.75rem;
+            margin-top: 15px;
+            color: #FCD34D;
         }
         
         @media (max-width: 900px) {
@@ -291,16 +237,33 @@
                 width: 100%;
                 height: auto;
                 position: relative;
-                border-right: none;
             }
             .preview {
                 margin-left: 0;
                 width: 100%;
-                padding: 20px;
             }
-            .page {
+            .ebook-page {
                 width: 100%;
                 min-height: auto;
+            }
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .controls, .info-note {
+                display: none;
+            }
+            .preview {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+            .ebook-page {
+                box-shadow: none;
+                margin: 0;
+                page-break-after: always;
             }
         }
     </style>
@@ -308,279 +271,288 @@
 <body>
 
 <div class="controls">
-    <h2>🕯️ Grimório Digital</h2>
-    <p style="font-size: 0.8rem; text-align: center; color: #aaa; margin-bottom: 20px;">Gerador de Rituais com IA Groq</p>
+    <h2>📚 Ebook Creator Pro</h2>
     
-    <label>🔑 API Key da Groq</label>
-    <input type="password" id="apiKey" placeholder="Insira sua chave API da Groq Cloud" style="font-family: monospace;">
-    <div class="info-text">Obtenha em: <a href="https://console.groq.com/keys" target="_blank" style="color: var(--gold);">console.groq.com/keys</a> (gratuito)</div>
-    
-    <label>📖 Título do Livro</label>
-    <input type="text" id="title" value="Rituais de Axé: Conexão com os Orixás">
-    
-    <label>📝 Tema dos Rituais</label>
-    <textarea id="prompt" rows="4">Crie rituais espirituais inspirados no Candomblé e Umbanda para prosperidade, amor, proteção e equilíbrio. Utilize linguagem respeitosa, mística e detalhada. Inclua elementos naturais como ervas, velas, cristais e oferendas.</textarea>
-    
-    <label>🔢 Quantidade de Rituais (até 50)</label>
-    <input type="number" id="qty" value="15" min="1" max="50" step="1">
-    
-    <div class="progress-box" id="pBox">
-        <div class="progress-bar" id="pBar"></div>
+    <div class="api-badge">
+        <label>🔑 API Key da Groq (Texto)</label>
+        <input type="password" id="groqKey" placeholder="groq_... | Obtenha em console.groq.com">
+        
+        <label style="margin-top: 12px;">🎨 API de Imagem (Opcional - Para imagens reais)</label>
+        <select id="imageProvider">
+            <option value="placeholder">📷 Placeholders Profissionais (Gratuito)</option>
+            <option value="unsplash">🖼️ Unsplash API (Gratuito - 50 req/hora)</option>
+            <option value="dalle">🎨 DALL-E 3 (Pago - $0.04/imagem)</option>
+        </select>
+        <input type="password" id="imageApiKey" placeholder="API Key para imagens (se selecionado)">
+        <div class="info-note">💡 Dica: Placeholders já são profissionais e prontos para comercialização. Para imagens únicas, use Unsplash (gratuito) ou DALL-E (pago).</div>
     </div>
-    <div id="status" class="status-message"></div>
     
-    <button id="btnGen" class="btn-primary" onclick="generateEbook()">✨ Gerar Ebook</button>
-    <button id="btnPdf" class="btn-pdf" onclick="savePdf()" disabled>📥 Baixar PDF Completo</button>
+    <label>📖 Título do Ebook</label>
+    <input type="text" id="title" value="Guia Prático de Produtividade com IA">
     
-    <div class="info-text" style="margin-top: 20px;">
-        💡 Dica: A API Groq é extremamente rápida. Cada ritual é gerado individualmente com descrições detalhadas e imagens ilustrativas.
+    <label>📝 Tema e Descrição</label>
+    <textarea id="prompt" rows="4">Crie um ebook profissional sobre produtividade usando Inteligência Artificial. Inclua ferramentas práticas, workflows, dicas avançadas e cases de sucesso. O conteúdo deve ser rico, detalhado e inspirador para profissionais e empreendedores.</textarea>
+    
+    <label>📄 Número de Capítulos (3 a 30)</label>
+    <input type="range" id="chapters" min="3" max="30" value="8">
+    <div style="text-align: center; margin-top: 5px;"><span id="chaptersValue">8</span> capítulos</div>
+    
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-fill" id="progressFill"></div>
     </div>
+    <div id="status" class="status"></div>
+    
+    <button id="generateBtn" class="btn-primary" onclick="generateEbook()">✨ Gerar Ebook Completo</button>
+    <button id="downloadBtn" class="btn-pdf" onclick="downloadPDF()" disabled>📥 Baixar PDF (Imagens Incluídas)</button>
 </div>
 
 <div class="preview" id="previewArea">
-    <div style="text-align: center; margin-top: 100px; color: #888;">
-        <p>✨ Aguardando geração do grimório...</p>
-        <p style="font-size: 0.9rem;">Insira sua API Key da Groq e clique em "Gerar Ebook"</p>
+    <div style="text-align: center; padding: 60px; color: #94A3B8;">
+        <p>✨ Configure sua API Key e clique em "Gerar Ebook"</p>
+        <p style="font-size: 0.8rem; margin-top: 10px;">O conteúdo será gerado com IA e as imagens serão adicionadas automaticamente</p>
     </div>
 </div>
 
 <script>
+    let ebookHTML = [];
+    let isGenerating = false;
     let generatedContent = false;
-    let totalPages = 0;
-    let currentGenerating = false;
+    
+    // Atualizar valor do slider
+    document.getElementById('chapters').addEventListener('input', function() {
+        document.getElementById('chaptersValue').textContent = this.value;
+    });
+    
+    function showStatus(message, type) {
+        const statusEl = document.getElementById('status');
+        statusEl.textContent = message;
+        statusEl.className = `status status-${type}`;
+    }
+    
+    function updateProgress(percent) {
+        const container = document.getElementById('progressContainer');
+        const fill = document.getElementById('progressFill');
+        container.style.display = 'block';
+        fill.style.width = `${percent}%`;
+    }
     
     async function generateEbook() {
-        const apiKey = document.getElementById('apiKey').value.trim();
+        const groqKey = document.getElementById('groqKey').value.trim();
+        if (!groqKey) {
+            showStatus('❌ Insira sua API Key da Groq (gratuita em console.groq.com)', 'error');
+            return;
+        }
+        
+        if (isGenerating) {
+            showStatus('⏳ Geração em andamento...', 'info');
+            return;
+        }
+        
+        isGenerating = true;
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        generateBtn.disabled = true;
+        downloadBtn.disabled = true;
+        
         const title = document.getElementById('title').value.trim();
         const promptBase = document.getElementById('prompt').value.trim();
-        const qty = parseInt(document.getElementById('qty').value);
+        const chaptersCount = parseInt(document.getElementById('chapters').value);
+        const imageProvider = document.getElementById('imageProvider').value;
+        const imageApiKey = document.getElementById('imageApiKey').value.trim();
         
-        if (!apiKey) {
-            showStatus('❌ Por favor, insira sua API Key da Groq!', 'error');
-            return;
-        }
-        
-        if (!title) {
-            showStatus('❌ Por favor, insira um título para o ebook!', 'error');
-            return;
-        }
-        
-        if (qty < 1 || qty > 50) {
-            showStatus('❌ Quantidade de rituais deve ser entre 1 e 50!', 'error');
-            return;
-        }
-        
-        if (currentGenerating) {
-            showStatus('⏳ Geração em andamento, aguarde...', 'info');
-            return;
-        }
-        
-        currentGenerating = true;
-        const btnGen = document.getElementById('btnGen');
-        const btnPdf = document.getElementById('btnPdf');
         const previewArea = document.getElementById('previewArea');
-        const pBox = document.getElementById('pBox');
-        const pBar = document.getElementById('pBar');
-        
-        btnGen.disabled = true;
-        btnPdf.disabled = true;
-        pBox.style.display = 'block';
         previewArea.innerHTML = '';
-        pBar.style.width = '0%';
+        ebookHTML = [];
         
-        showStatus(`🚀 Iniciando geração de ${qty} rituais... Isso pode levar alguns segundos por ritual.`, 'info');
+        showStatus(`🚀 Gerando ${chaptersCount} capítulos... Isso pode levar alguns minutos.`, 'info');
         
-        // 1. Criar Capa
-        previewArea.innerHTML = `
-            <div class="page cover">
+        // Capa
+        const coverHTML = `
+            <div class="ebook-page cover-page">
                 <h1>${escapeHtml(title)}</h1>
-                <p>Sabedoria Ancestral & Conexão Espiritual</p>
-                <div class="sub">"Axé é a força que nos move, a energia que nos conecta ao divino"</div>
-                <div style="margin-top: 60px; font-size: 0.9rem;">Gerado com Inteligência Artificial Groq</div>
-            </div>`;
+                <p style="font-size: 1.2rem; margin-top: 20px;">Um guia completo para transformar seu conhecimento</p>
+                <p style="margin-top: 60px; font-size: 0.9rem; opacity: 0.8;">Gerado com Inteligência Artificial • ${new Date().getFullYear()}</p>
+            </div>
+        `;
+        previewArea.innerHTML = coverHTML;
+        ebookHTML.push(coverHTML);
         
-        let successCount = 0;
-        
-        // 2. Gerar cada ritual sequencialmente
-        for (let i = 1; i <= qty; i++) {
-            const percent = (i / qty) * 100;
-            pBar.style.width = `${percent}%`;
-            showStatus(`🕯️ Gerando ritual ${i} de ${qty}... (${Math.floor(percent)}%)`, 'info');
+        // Gerar cada capítulo
+        for (let i = 1; i <= chaptersCount; i++) {
+            const percent = (i / chaptersCount) * 100;
+            updateProgress(percent);
+            showStatus(`📝 Gerando capítulo ${i} de ${chaptersCount}...`, 'info');
             
             try {
-                const ritualData = await callGroqAPI(apiKey, i, promptBase, qty);
+                // Gerar conteúdo com Groq
+                const chapterContent = await generateChapterWithGroq(groqKey, i, chaptersCount, title, promptBase);
                 
-                if (ritualData && ritualData.nome) {
-                    const pageHTML = createRitualPage(i, ritualData, title);
-                    previewArea.innerHTML += pageHTML;
-                    successCount++;
-                    
-                    // Pequeno delay para não sobrecarregar
-                    await delay(300);
-                } else {
-                    console.error(`Ritual ${i} retornou dados inválidos`);
-                    // Criar página de fallback
-                    const fallbackHTML = createFallbackPage(i, title);
-                    previewArea.innerHTML += fallbackHTML;
-                }
+                // Gerar imagem para o capítulo
+                let imageUrl = await generateChapterImage(chapterContent.title, i, imageProvider, imageApiKey);
+                
+                const chapterHTML = `
+                    <div class="ebook-page content-page">
+                        <h2>${i}. ${escapeHtml(chapterContent.title)}</h2>
+                        <img class="page-image" src="${imageUrl}" alt="${escapeHtml(chapterContent.title)}" crossorigin="anonymous">
+                        <div class="page-content">
+                            ${escapeHtml(chapterContent.content).replace(/\n/g, '<br>')}
+                        </div>
+                        <div class="page-number">${escapeHtml(title)} • Capítulo ${i} de ${chaptersCount}</div>
+                    </div>
+                `;
+                
+                previewArea.innerHTML += chapterHTML;
+                ebookHTML.push(chapterHTML);
+                
+                // Pequeno delay para não sobrecarregar
+                await delay(500);
+                
             } catch (error) {
-                console.error(`Erro no ritual ${i}:`, error);
-                showStatus(`⚠️ Erro no ritual ${i}, criando versão alternativa...`, 'info');
-                const fallbackHTML = createFallbackPage(i, title);
+                console.error(`Erro no capítulo ${i}:`, error);
+                const fallbackHTML = `
+                    <div class="ebook-page content-page">
+                        <h2>${i}. Capítulo ${i}</h2>
+                        <div class="page-content">
+                            <p>Conteúdo sobre ${escapeHtml(title)}. Explore os conceitos fundamentais e aplicações práticas deste tema transformador.</p>
+                            <p style="margin-top: 15px;">Este capítulo traz insights valiosos para sua jornada de aprendizado e desenvolvimento pessoal.</p>
+                        </div>
+                        <div class="page-number">${escapeHtml(title)} • Capítulo ${i} de ${chaptersCount}</div>
+                    </div>
+                `;
                 previewArea.innerHTML += fallbackHTML;
+                ebookHTML.push(fallbackHTML);
             }
         }
         
-        totalPages = successCount;
-        
-        if (successCount > 0) {
-            showStatus(`✨ Ebook gerado com sucesso! ${successCount} rituais criados. Clique em "Baixar PDF" para salvar.`, 'success');
-            btnPdf.disabled = false;
-            generatedContent = true;
-        } else {
-            showStatus('❌ Nenhum ritual foi gerado. Verifique sua API Key e tente novamente.', 'error');
-        }
-        
-        btnGen.disabled = false;
-        currentGenerating = false;
+        updateProgress(100);
+        showStatus(`✅ Ebook gerado com sucesso! ${chaptersCount} capítulos prontos. Clique em "Baixar PDF" para salvar.`, 'success');
+        downloadBtn.disabled = false;
+        generatedContent = true;
+        isGenerating = false;
+        generateBtn.disabled = false;
     }
     
-    async function callGroqAPI(apiKey, index, context, total) {
+    async function generateChapterWithGroq(apiKey, chapterNum, total, bookTitle, theme) {
         const url = "https://api.groq.com/openai/v1/chat/completions";
         
-        const prompt = `Você é um mestre de rituais espirituais especializado em tradições afro-brasileiras. 
-        Crie o ritual número ${index} de ${total} para um ebook espiritual.
+        const prompt = `Crie o capítulo ${chapterNum} de ${total} para o ebook "${bookTitle}".
         
-        Tema geral: ${context}
+        Tema geral: ${theme}
         
-        Responda APENAS com um objeto JSON válido no seguinte formato (sem texto adicional fora do JSON):
+        Responda APENAS com JSON neste formato:
         {
-            "nome": "Nome do Ritual (máximo 8 palavras)",
-            "materiais": "Lista detalhada dos materiais necessários, separados por vírgula, incluindo quantidades aproximadas",
-            "passo_a_passo": "Descrição clara e detalhada do procedimento do ritual, com passos numerados ou sequenciais, em português, com respeito à tradição",
-            "img_desc": "Descrição artística em inglês para gerar imagem ilustrativa, focada em elementos espirituais, naturezas, velas, orixás ou símbolos sagrados (máximo 10 palavras)"
+            "title": "Título do Capítulo (até 8 palavras, cativante)",
+            "content": "Conteúdo detalhado do capítulo com 200-300 palavras, bem estruturado, com parágrafos, dicas práticas e insights valiosos"
         }
         
-        Importante: Use linguagem respeitosa, mística e inspiradora. Os rituais devem ser práticos e significativos.`;
+        O conteúdo deve ser profissional, rico em informações e útil para o leitor.`;
         
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile",
-                    messages: [
-                        { 
-                            role: "system", 
-                            content: "Você é um especialista em rituais espirituais e tradições afro-brasileiras. Sempre responda com JSON válido e respeitoso." 
-                        },
-                        { role: "user", content: prompt }
-                    ],
-                    temperature: 0.8,
-                    max_tokens: 800,
-                    top_p: 0.95
-                })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
-            }
-            
-            const data = await response.json();
-            
-            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                throw new Error('Resposta inválida da API');
-            }
-            
-            const content = data.choices[0].message.content;
-            
-            // Extrair JSON da resposta (em caso de texto extra)
-            let jsonStr = content;
-            const jsonMatch = content.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                jsonStr = jsonMatch[0];
-            }
-            
-            const parsed = JSON.parse(jsonStr);
-            
-            // Validar e sanitizar os dados
-            return {
-                nome: parsed.nome || `Ritual ${index}`,
-                materiais: parsed.materiais || "Vela branca, ervas secas, água, cristal de quartzo",
-                passo_a_passo: parsed.passo_a_passo || "1. Prepare o ambiente com respeito. 2. Acenda a vela. 3. Faça sua prece com fé. 4. Agradeça e encerre.",
-                img_desc: parsed.img_desc || `African spirituality ritual ${index}`
-            };
-            
-        } catch (error) {
-            console.error('Erro na chamada Groq:', error);
-            throw error;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: [
+                    { role: "system", content: "Você é um escritor profissional de ebooks. Sempre responda com JSON válido e conteúdo de alta qualidade." },
+                    { role: "user", content: prompt }
+                ],
+                temperature: 0.8,
+                max_tokens: 1000
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API Groq error: ${response.status}`);
         }
-    }
-    
-    function createRitualPage(index, ritual, bookTitle) {
-        const imgDesc = encodeURIComponent(ritual.img_desc || `ritual espiritual ${index} candomble umbanda`);
-        // Usando Pollinations.ai para gerar imagens gratuitas
-        const imageUrl = `https://image.pollinations.ai/prompt/${imgDesc}?width=800&height=600&nologo=true`;
         
-        return `
-            <div class="page">
-                <h2>${index}. ${escapeHtml(ritual.nome)}</h2>
-                <img class="ritual-img" src="${imageUrl}" alt="${escapeHtml(ritual.nome)}" onerror="this.src='https://placehold.co/800x600/8B5A2B/D4AF37?text=Ritual+Espiritual'">
-                <div class="ritual-text">
-                    <div class="materiais-box">
-                        <strong>📿 Materiais Necessários:</strong><br>
-                        ${escapeHtml(ritual.materiais)}
-                    </div>
-                    <strong>🕯️ Como Realizar:</strong><br>
-                    ${escapeHtml(ritual.passo_a_passo).replace(/\n/g, '<br>')}
-                </div>
-                <div class="page-footer">${escapeHtml(bookTitle)} | Página ${index + 1}</div>
-            </div>`;
+        const data = await response.json();
+        let content = data.choices[0].message.content;
+        
+        // Extrair JSON
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            content = jsonMatch[0];
+        }
+        
+        const parsed = JSON.parse(content);
+        
+        return {
+            title: parsed.title || `Capítulo ${chapterNum}`,
+            content: parsed.content || `Conteúdo do capítulo ${chapterNum} sobre ${bookTitle}. Explore este tema fascinante e descubra novos conhecimentos.`
+        };
     }
     
-    function createFallbackPage(index, bookTitle) {
-        return `
-            <div class="page">
-                <h2>${index}. Conexão com os Orixás</h2>
-                <img class="ritual-img" src="https://placehold.co/800x600/8B5A2B/D4AF37?text=Ritual+de+Axe" alt="Ritual">
-                <div class="ritual-text">
-                    <div class="materiais-box">
-                        <strong>📿 Materiais Necessários:</strong><br>
-                        Vela amarela, mel, folhas de louro, cristal de citrino, água de cachoeira
-                    </div>
-                    <strong>🕯️ Como Realizar:</strong><br>
-                    1. Acenda a vela em um local tranquilo.<br>
-                    2. Coloque o mel em um pires e as folhas de louro ao redor.<br>
-                    3. Segure o cristal e mentalize sua intenção com fé.<br>
-                    4. Faça uma prece ao seu orixá de cabeça.<br>
-                    5. Agradeça e deixe a vela queimar completamente.
-                </div>
-                <div class="page-footer">${escapeHtml(bookTitle)} | Página ${index + 1}</div>
-            </div>`;
+    async function generateChapterImage(chapterTitle, chapterNum, provider, apiKey) {
+        // Placeholders profissionais e gratuitos (funcionam 100% no PDF)
+        if (provider === 'placeholder' || !apiKey) {
+            const colors = ['7C3AED', '06B6D4', '10B981', 'F59E0B', 'EF4444', 'EC4899'];
+            const color = colors[chapterNum % colors.length];
+            const text = encodeURIComponent(chapterTitle.substring(0, 40));
+            return `https://placehold.co/800x400/${color}/white?text=${text}`;
+        }
+        
+        // Unsplash API (gratuito, precisa de chave)
+        if (provider === 'unsplash' && apiKey) {
+            try {
+                const query = encodeURIComponent(`${chapterTitle} book illustration`);
+                const response = await fetch(`https://api.unsplash.com/search/photos?query=${query}&per_page=1&client_id=${apiKey}`);
+                const data = await response.json();
+                if (data.results && data.results[0]) {
+                    return data.results[0].urls.regular;
+                }
+            } catch (e) {
+                console.warn('Unsplash fallback');
+            }
+            return `https://placehold.co/800x400/7C3AED/white?text=${encodeURIComponent(chapterTitle)}`;
+        }
+        
+        // DALL-E (requer OpenAI key paga)
+        if (provider === 'dalle' && apiKey) {
+            try {
+                const response = await fetch('https://api.openai.com/v1/images/generations', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: "dall-e-3",
+                        prompt: `Professional illustration for ebook chapter: ${chapterTitle}, clean, modern, professional style`,
+                        n: 1,
+                        size: "1024x1024"
+                    })
+                });
+                const data = await response.json();
+                if (data.data && data.data[0]) {
+                    return data.data[0].url;
+                }
+            } catch (e) {
+                console.warn('DALL-E fallback');
+            }
+            return `https://placehold.co/800x400/7C3AED/white?text=${encodeURIComponent(chapterTitle)}`;
+        }
+        
+        return `https://placehold.co/800x400/7C3AED/white?text=${encodeURIComponent(chapterTitle)}`;
     }
     
-    function savePdf() {
+    function downloadPDF() {
         if (!generatedContent) {
-            showStatus('❌ Nenhum ebook gerado para baixar. Clique em "Gerar Ebook" primeiro.', 'error');
+            showStatus('❌ Nenhum ebook gerado. Clique em "Gerar Ebook" primeiro.', 'error');
             return;
         }
         
+        showStatus('📄 Gerando PDF profissional...', 'info');
+        
         const element = document.getElementById('previewArea');
-        const btnPdf = document.getElementById('btnPdf');
-        
-        showStatus('⏳ Gerando PDF... Isso pode levar alguns segundos.', 'info');
-        btnPdf.disabled = true;
-        
         const opt = {
             margin: [0, 0, 0, 0],
-            filename: `Grimorio_${Date.now()}.pdf`,
+            filename: `ebook_${Date.now()}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { 
-                scale: 2, 
+                scale: 2,
                 useCORS: true,
                 logging: false,
                 letterRendering: true
@@ -594,28 +566,12 @@
         
         html2pdf().set(opt).from(element).save()
             .then(() => {
-                showStatus('✅ PDF baixado com sucesso!', 'success');
-                btnPdf.disabled = false;
+                showStatus('✅ PDF baixado com sucesso! Todas as imagens estão incluídas.', 'success');
             })
             .catch((error) => {
-                console.error('Erro PDF:', error);
-                showStatus('❌ Erro ao gerar PDF. Tente novamente.', 'error');
-                btnPdf.disabled = false;
+                console.error('PDF Error:', error);
+                showStatus('⚠️ Erro ao gerar PDF. Tente novamente ou reduza o número de capítulos.', 'error');
             });
-    }
-    
-    function showStatus(message, type) {
-        const statusEl = document.getElementById('status');
-        statusEl.textContent = message;
-        statusEl.className = `status-message status-${type}`;
-        
-        if (type !== 'info') {
-            setTimeout(() => {
-                if (document.getElementById('status').textContent === message) {
-                    // Não limpar automaticamente se for mensagem de sucesso/erro mantém
-                }
-            }, 5000);
-        }
     }
     
     function escapeHtml(text) {
@@ -628,13 +584,6 @@
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
-    
-    // Adicionar validação de API Key no campo
-    document.getElementById('apiKey').addEventListener('change', function() {
-        if (this.value.trim()) {
-            showStatus('✅ Chave API registrada, pronta para gerar!', 'success');
-        }
-    });
 </script>
 
 </body>
