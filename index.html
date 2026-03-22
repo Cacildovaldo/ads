@@ -3,125 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI eBook Creator PRO - Versão Estável</title>
+    <title>Gerador de Ebook Místico - Groq Speed</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; display: flex; gap: 20px; }
-        .setup-panel { width: 350px; background: white; padding: 20px; border-radius: 10px; height: fit-content; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .preview-panel { flex: 1; background: #ddd; padding: 20px; border-radius: 10px; min-height: 80vh; overflow-y: auto; }
-        input, textarea, button { width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
-        button { cursor: pointer; background: #4f46e5; color: white; font-weight: bold; border: none; }
-        button:disabled { background: #ccc; }
-        .page { background: white; width: 210mm; min-height: 297mm; padding: 20mm; margin: 0 auto 20px auto; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-        .cover { background: #4f46e5; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .progress { background: #e0e0e0; height: 10px; border-radius: 5px; margin-bottom: 10px; display: none; }
-        .progress-fill { background: #4f46e5; height: 100%; width: 0%; border-radius: 5px; transition: 0.3s; }
-        img { max-width: 100%; height: auto; border-radius: 8px; margin: 15px 0; display: block; }
+        :root { --ritual-color: #4b0082; --gold: #ffd700; }
+        body { font-family: 'Georgia', serif; background: #1a1a1a; color: #e0e0e0; margin: 0; display: flex; }
+        
+        /* Painel de Controle */
+        .controls { width: 320px; background: #2d2d2d; padding: 25px; height: 100vh; position: fixed; box-shadow: 2px 0 10px rgba(0,0,0,0.5); z-index: 100; }
+        .controls h2 { color: var(--gold); font-size: 1.2rem; }
+        input, textarea, select, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: none; font-family: sans-serif; }
+        button { background: var(--ritual-color); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        button:hover { background: #6a0dad; }
+        button:disabled { background: #555; cursor: not-allowed; }
+
+        /* Área do Ebook */
+        .preview { margin-left: 340px; padding: 40px; width: calc(100% - 340px); display: flex; flex-direction: column; align-items: center; }
+        
+        /* Estilo da Página PDF */
+        .page { 
+            width: 210mm; min-height: 297mm; background: white; color: #333;
+            padding: 25mm; margin-bottom: 30px; box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            position: relative; overflow: hidden; page-break-after: always;
+            box-sizing: border-box;
+        }
+        .cover { background: var(--ritual-color); color: var(--gold); text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .cover h1 { font-size: 3rem; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+        
+        .page h2 { color: var(--ritual-color); border-left: 5px solid var(--gold); padding-left: 15px; }
+        .ritual-img { width: 100%; height: 350px; object-fit: cover; border: 3px solid #eee; margin: 20px 0; }
+        .ritual-text { font-size: 1.1rem; line-height: 1.6; text-align: justify; }
+        .page-footer { position: absolute; bottom: 15mm; left: 0; right: 0; text-align: center; color: #999; font-size: 0.8rem; }
+
+        .progress-box { margin-top: 15px; background: #444; height: 12px; border-radius: 6px; overflow: hidden; display: none; }
+        .progress-bar { height: 100%; background: var(--gold); width: 0%; transition: 0.4s; }
     </style>
 </head>
 <body>
 
-    <div class="setup-panel">
-        <h2>Configuração</h2>
-        <input type="password" id="apiKey" placeholder="Sua API Key do Gemini">
-        <input type="text" id="title" placeholder="Título do Ebook">
-        <textarea id="prompt" rows="5" placeholder="Descreva o conteúdo detalhadamente..."></textarea>
-        <label>Páginas (Ex: 50):</label>
-        <input type="number" id="pages" value="10" min="3" max="100">
+<div class="controls">
+    <h2>🕯️ Ritual Creator AI</h2>
+    <input type="password" id="apiKey" placeholder="Cole sua API Key da Groq">
+    <input type="text" id="title" value="20 Rituais de Axé: Amor e Riqueza">
+    <textarea id="prompt" rows="5">Crie rituais rápidos de Candomblé e Umbanda para prosperidade e amor. Use linguagem respeitosa e mística.</textarea>
+    
+    <label style="font-size: 0.8rem; display: block; margin-top: 15px;">Total de Rituais:</label>
+    <input type="number" id="qty" value="20" min="1" max="50">
+
+    <div class="progress-box" id="pBox"><div class="progress-bar" id="pBar"></div></div>
+    <p id="status" style="font-size: 0.8rem; color: var(--gold);"></p>
+
+    <button id="btnGen" onclick="generate()">Gerar Conteúdo</button>
+    <button id="btnPdf" onclick="savePdf()" disabled style="background: #27ae60;">Baixar Ebook Final (PDF)</button>
+</div>
+
+<div class="preview" id="previewArea">
+    <div style="opacity: 0.5; text-align: center; margin-top: 100px;">
+        <p>Aguardando configuração...</p>
+    </div>
+</div>
+
+<script>
+    async function generate() {
+        const key = document.getElementById('apiKey').value;
+        const title = document.getElementById('title').value;
+        const promptBase = document.getElementById('prompt').value;
+        const qty = parseInt(document.getElementById('qty').value);
         
-        <div class="progress" id="progBar"><div class="progress-fill" id="fill"></div></div>
-        <p id="statusText" style="font-size: 12px; color: #666;"></p>
+        if(!key) return alert("Por favor, insira a Chave API da Groq!");
 
-        <button id="btnGen" onclick="startGeneration()">Gerar Ebook</button>
-        <button id="btnPdf" onclick="downloadPDF()" disabled style="background: #10b981;">Baixar PDF</button>
-    </div>
+        const btn = document.getElementById('btnGen');
+        const area = document.getElementById('previewArea');
+        const pBar = document.getElementById('pBar');
+        const pBox = document.getElementById('pBox');
+        const status = document.getElementById('status');
 
-    <div class="preview-panel" id="renderArea">
-        <div style="text-align: center; color: #666; margin-top: 50px;">O preview do seu ebook aparecerá aqui.</div>
-    </div>
+        btn.disabled = true;
+        area.innerHTML = '';
+        pBox.style.display = 'block';
 
-    <script>
-        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+        // 1. Criar Capa
+        area.innerHTML += `
+            <div class="page cover">
+                <h1>${title}</h1>
+                <p>Sabedoria e Prática para o Dia a Dia</p>
+                <div style="margin-top: 40px; font-style: italic;">Axé e Prosperidade</div>
+            </div>`;
 
-        async function startGeneration() {
-            const key = document.getElementById('apiKey').value;
-            const title = document.getElementById('title').value;
-            const promptStr = document.getElementById('prompt').value;
-            const totalPages = parseInt(document.getElementById('pages').value);
+        // 2. Loop de Geração com Groq
+        for(let i = 1; i <= qty; i++) {
+            status.innerText = `Invocando ritual ${i} de ${qty}...`;
+            pBar.style.width = `${(i/qty)*100}%`;
 
-            if(!key || !title) return alert("Preencha a Chave API e o Título!");
-
-            const btn = document.getElementById('btnGen');
-            const render = document.getElementById('renderArea');
-            const fill = document.getElementById('fill');
-            const prog = document.getElementById('progBar');
-            const status = document.getElementById('statusText');
-
-            btn.disabled = true;
-            render.innerHTML = '';
-            prog.style.display = 'block';
-
-            // 1. Capa
-            render.innerHTML += `<div class="page cover"><h1>${title}</h1><p>Gerado por Inteligência Artificial</p></div>`;
-
-            // 2. Loop de Páginas
-            for(let i = 1; i <= totalPages; i++) {
-                status.innerText = `Gerando página ${i} de ${totalPages}...`;
-                fill.style.width = `${(i / totalPages) * 100}%`;
-
-                try {
-                    const content = await callAI(key, title, promptStr, i, totalPages);
-                    render.innerHTML += `
-                        <div class="page">
-                            <h2>${content.capitulo}</h2>
-                            <img src="https://image.pollinations.ai/prompt/${encodeURIComponent(content.img_desc)}?width=800&height=600&nologo=true">
-                            <p style="text-align: justify; white-space: pre-wrap;">${content.texto}</p>
-                            <div style="margin-top:20px; text-align:center; color:#999;">Página ${i}</div>
-                        </div>`;
-                } catch (err) {
-                    console.error(err);
-                    status.innerText = "Erro na API. Verifique o console (F12).";
-                    break;
-                }
-                // Delay para evitar bloqueio da API (Rate Limit)
-                await new Promise(r => setTimeout(r, 800));
+            try {
+                const ritual = await callGroq(key, i, promptBase);
+                area.innerHTML += `
+                    <div class="page">
+                        <h2>${i}. ${ritual.nome}</h2>
+                        <img class="ritual-img" src="https://image.pollinations.ai/prompt/${encodeURIComponent(ritual.img_desc + " candomble umbanda style")}?width=800&height=600&nologo=true" alt="Imagem do Ritual">
+                        <div class="ritual-text">
+                            <strong>O que você vai precisar:</strong><br>
+                            ${ritual.materiais}<br><br>
+                            <strong>Como fazer:</strong><br>
+                            ${ritual.passo_a_passo}
+                        </div>
+                        <div class="page-footer">Página ${i + 1} | ${title}</div>
+                    </div>`;
+            } catch (e) {
+                console.error(e);
+                status.innerText = "Erro na conexão. Verifique sua chave.";
+                break;
             }
-
-            status.innerText = "✅ Ebook Concluído!";
-            btn.disabled = false;
-            document.getElementById('btnPdf').disabled = false;
         }
 
-        async function callAI(key, title, context, pageNum, total) {
-            const instructions = `Aja como um escritor de ebooks. Escreva a página ${pageNum} de um livro chamado "${title}". 
-            Contexto: ${context}. Responda APENAS em formato JSON puro: 
-            {"capitulo": "Título da Página", "texto": "Conteúdo com 200 palavras", "img_desc": "descrição curta em inglês para imagem"}`;
+        status.innerText = "✨ Todos os rituais foram carregados!";
+        btn.disabled = false;
+        document.getElementById('btnPdf').disabled = false;
+    }
 
-            const resp = await fetch(`${API_URL}?key=${key}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: instructions }] }],
-                    generationConfig: { responseMimeType: "application/json", temperature: 0.7 }
-                })
-            });
+    async function callGroq(key, index, context) {
+        // Usando o modelo Llama-3-8b que é gratuito e rápido na Groq
+        const url = "https://api.groq.com/openai/v1/chat/completions";
+        const prompt = `Crie o ritual número ${index} para um ebook. Tema: ${context}. 
+        Responda EXATAMENTE neste formato JSON:
+        {"nome": "Nome Curto do Ritual", "materiais": "lista de itens separados por vírgula", "passo_a_passo": "explicação curta de como fazer", "img_desc": "short artistic description in english of african orishas or ritual elements"}`;
 
-            if (!resp.ok) throw new Error("Falha na API");
-            const data = await resp.json();
-            return JSON.parse(data.candidates[0].content.parts[0].text);
-        }
+        const resp = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${key}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: "llama3-8b-8192",
+                messages: [{ role: "user", content: prompt }],
+                response_format: { type: "json_object" }
+            })
+        });
 
-        function downloadPDF() {
-            const element = document.getElementById('renderArea');
-            const opt = {
-                margin: 0,
-                filename: 'ebook-ia-pro.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 1.5, useCORS: true, logging: false },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
-        }
-    </script>
+        const data = await resp.json();
+        return JSON.parse(data.choices[0].message.content);
+    }
+
+    function savePdf() {
+        const element = document.getElementById('previewArea');
+        const opt = {
+            margin: 0,
+            filename: 'Ebook_Rituais_Axe.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        document.getElementById('status').innerText = "⏳ Convertendo para PDF... Aguarde um momento.";
+        html2pdf().set(opt).from(element).save().then(() => {
+            document.getElementById('status').innerText = "✅ Download concluído!";
+        });
+    }
+</script>
+
 </body>
 </html>
